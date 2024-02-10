@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import de.rollocraft.allminecraft.utils.Config;
 import de.rollocraft.allminecraft.Main;
 
 
@@ -15,17 +14,9 @@ public class Timer {
     private boolean running; // true or false
     private int time;
 
-    public Timer() {
-        Config config = Main.getInstance().getConfiguration();
-
+    public Timer(int loadedTime) {
+        this.time = loadedTime;
         this.running = false;
-
-        if (config.getConfig().contains("timer.time")) {
-            this.time = config.getConfig().getInt("timer.time");
-        } else {
-            this.time = 0;
-        }
-
         run();
     }
 
@@ -57,12 +48,6 @@ public class Timer {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD.toString() +
                     ChatColor.BOLD + getTime()));
         }
-    }
-
-    public void save() {
-        Config config = Main.getInstance().getConfiguration();
-
-        config.getConfig().set("timer.time", time);
     }
 
     private void run() {

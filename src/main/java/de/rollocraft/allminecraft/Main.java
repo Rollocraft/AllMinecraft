@@ -8,6 +8,7 @@ import de.rollocraft.allminecraft.Events.PlayerPickupEvent;
 import de.rollocraft.allminecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Manager.BossBarManager;
 import de.rollocraft.allminecraft.Manager.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Manager.Database.TimerDatabaseManager;
 
 import de.rollocraft.allminecraft.Manager.Timer;
 import de.rollocraft.allminecraft.utils.Config;
@@ -24,6 +25,7 @@ public class Main extends JavaPlugin {
     private BackpackManager backpackManager;
     private ItemDatabaseManager databaseManager;
     private BossBarManager bossBarManager;
+    private TimerDatabaseManager timerDatabaseManager;
 
     @Override
     public void onLoad() {
@@ -34,7 +36,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("Enabeling AllMinecraft PLugin this may take a a few seconds...");
+        getLogger().info("Enabling AllMinecraft Plugin this may take a a few seconds...");
 
         //Create the database directory if it doesn't exist
         File directory = new File("./plugins/Challenges/Database");
@@ -59,7 +61,17 @@ public class Main extends JavaPlugin {
         // Register BossBar
         bossBarManager = new BossBarManager(this, databaseManager);
 
-        timer = new Timer();
+        timerDatabaseManager = new TimerDatabaseManager(databaseManager.getConnection());
+        try {
+            timerDatabaseManager.createTimerTableIfNotExists();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            timer = new Timer(timerDatabaseManager.loadTimer());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         backpackManager = new BackpackManager();
 
         // Events
@@ -67,8 +79,10 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerPickupEvent(this, databaseManager, bossBarManager), this);
 
         // Commands
+        TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
+        this.getCommand("timer").setExecutor(timerCommand);
+        this.getCommand("timer").setTabCompleter(timerCommand);
         this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, databaseManager));
-        this.getCommand("timer").setExecutor(new TimerCommand());
         this.getCommand("backpack").setExecutor(new BackpackCommand());
 
         getLogger().info("AllMinecraft Plugin has been enabled!");
@@ -77,7 +91,11 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        timer.save();
+        try {
+            timerDatabaseManager.saveTimer(timer);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         backpackManager.save();
         getLogger().info("Saving all items to database...");
 

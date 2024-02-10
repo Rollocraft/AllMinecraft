@@ -134,4 +134,7 @@ public class ItemDatabaseManager {
             return !resultSet.next() || resultSet.getInt(1) == 0;
         }
     }
+    public Connection getConnection() {
+        return connection;
+    }
 }

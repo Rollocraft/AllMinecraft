@@ -1,52 +1,37 @@
 package de.rollocraft.allminecraft.Manager.Database;
+// TimerDatabaseManager.java
+import de.rollocraft.allminecraft.Manager.Timer;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 
 public class TimerDatabaseManager {
     private Connection connection;
 
-    public TimerDatabaseManager() {
-        connectToDatabase();
+    public TimerDatabaseManager(Connection connection) {
+        this.connection = connection;
     }
 
-    private void connectToDatabase() {
-        try {
-            File dbFile = new File("./plugins/Challenges/Database/timer.db");
-            if (!dbFile.exists()) {
-                dbFile.createNewFile();
-            }
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
-            createTableIfNotExists();
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createTableIfNotExists() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS timer (id INT PRIMARY KEY, time BIGINT)";
+    public void createTimerTableIfNotExists() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+            stmt.execute("CREATE TABLE IF NOT EXISTS timer (id INTEGER PRIMARY KEY, time INTEGER NOT NULL)");
         }
     }
 
-    public void saveTime(long time) throws SQLException {
-        String sql = "INSERT OR REPLACE INTO timer (id, time) VALUES (1, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setLong(1, time);
+    public void saveTimer(Timer timer) throws SQLException {
+        try (PreparedStatement pstmt = connection.prepareStatement("INSERT OR REPLACE INTO timer (id, time) VALUES (?, ?)")) {
+            pstmt.setInt(1, 1); // Wir verwenden immer die ID 1 für den Timer
+            pstmt.setInt(2, timer.getTime());
             pstmt.executeUpdate();
         }
     }
 
-    public long loadTime() throws SQLException {
-        String sql = "SELECT time FROM timer WHERE id = 1";
+    public int loadTimer() throws SQLException {
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery("SELECT time FROM timer WHERE id = 1")) {
             if (rs.next()) {
-                return rs.getLong("time");
+                return rs.getInt("time");
             } else {
-                return 0;
+                return 0; // Standardwert, wenn kein Timer gespeichert wurde
             }
         }
     }
