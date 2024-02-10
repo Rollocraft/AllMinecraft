@@ -1,95 +1,63 @@
 package de.rollocraft.allminecraft.Manager.Database;
 
-import org.bukkit.inventory.ItemStack;
-import java.sql.*;
-import java.io.*;
+import de.rollocraft.allminecraft.Manager.Backpack;
+import de.rollocraft.allminecraft.utils.Base64;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class BackpackDatabaseManager {
-    protected Connection connection;
 
-    public BackpackDatabaseManager() {
+    private Connection connection;
+
+    public BackpackDatabaseManager(String filename) {
+        connect(filename);
+        createTable();
+    }
+
+    private void connect(String filename) {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:./plugins/Challenges/Database/Database.db");
-            PreparedStatement statement = connection.prepareStatement(
-                    "CREATE TABLE IF NOT EXISTS backpack (slot INTEGER PRIMARY KEY, item BLOB)"
-            );
-            statement.execute();
-            statement.close();
-        } catch (Exception e) {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + filename);
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public ItemStack[] loadBackpack(int size) {
-        ItemStack[] backpack = new ItemStack[size];
-        try {
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT slot, item FROM backpack"
-            );
+    private void createTable() {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS backpacks (items TEXT)")) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveBackpack(Backpack backpack) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "REPLACE INTO backpacks (items) VALUES (?)")) {
+            statement.setString(1, backpack.toBase64());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Backpack loadBackpack() {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT items FROM backpacks")) {
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                int slot = resultSet.getInt("slot");
-                byte[] itemBytes = resultSet.getBytes("item");
-                ByteArrayInputStream bais = new ByteArrayInputStream(itemBytes);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                ItemStack item = (ItemStack) ois.readObject();
-                backpack[slot] = item;
+            if (resultSet.next()) {
+                String items = resultSet.getString("items");
+                return new Backpack(items);
             }
-
-            resultSet.close();
-            statement.close();
-        } catch (Exception e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-
-        return backpack;
-    }
-
-    public void saveBackpack(ItemStack[] backpack) {
-        try {
-            PreparedStatement deleteStatement = connection.prepareStatement(
-                    "DELETE FROM backpack"
-            );
-            deleteStatement.execute();
-            deleteStatement.close();
-
-            PreparedStatement insertStatement = connection.prepareStatement(
-                    "INSERT INTO backpack (slot, item) VALUES (?, ?)"
-            );
-
-            for (int i = 0; i < backpack.length; i++) {
-                if (backpack[i] != null) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
-                    oos.writeObject(backpack[i]);
-                    byte[] itemBytes = baos.toByteArray();
-
-                    insertStatement.setInt(1, i);
-                    insertStatement.setBytes(2, itemBytes);
-                    insertStatement.execute();
-                }
-            }
-
-            insertStatement.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public void connectToDatabase() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection("jdbc:sqlite:./plugins/Challenges/Database/Database.db");
-            PreparedStatement statement = connection.prepareStatement(
-                    "CREATE TABLE IF NOT EXISTS backpack (slot INTEGER PRIMARY KEY, item BLOB)"
-            );
-            statement.execute();
-            statement.close();
-        }
-    }
-
-    public void disconnectFromDatabase() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        return null;
     }
 }

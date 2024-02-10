@@ -5,8 +5,10 @@ import de.rollocraft.allminecraft.Commands.SkipItemCommand;
 import de.rollocraft.allminecraft.Commands.TimerCommand;
 import de.rollocraft.allminecraft.Events.PlayerJoinListener;
 import de.rollocraft.allminecraft.Events.PlayerPickupEvent;
+import de.rollocraft.allminecraft.Manager.Backpack;
 import de.rollocraft.allminecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Manager.BossBarManager;
+import de.rollocraft.allminecraft.Manager.Database.BackpackDatabaseManager;
 import de.rollocraft.allminecraft.Manager.Database.ItemDatabaseManager;
 import de.rollocraft.allminecraft.Manager.Database.TimerDatabaseManager;
 
@@ -26,6 +28,8 @@ public class Main extends JavaPlugin {
     private ItemDatabaseManager databaseManager;
     private BossBarManager bossBarManager;
     private TimerDatabaseManager timerDatabaseManager;
+    private BackpackDatabaseManager backpackDatabaseManager;
+    private Backpack sharedBackpack;
 
     @Override
     public void onLoad() {
@@ -56,7 +60,8 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to connect to database or save items: " + e.getMessage());
         }
 
-
+        backpackDatabaseManager = new BackpackDatabaseManager("backpacks.db");
+        sharedBackpack = loadBackpack();
 
         // Register BossBar
         bossBarManager = new BossBarManager(this, databaseManager);
@@ -91,6 +96,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        saveBackpack();
         try {
             timerDatabaseManager.saveTimer(timer);
         } catch (SQLException e) {
@@ -127,5 +133,18 @@ public class Main extends JavaPlugin {
 
     public BackpackManager getBackpackManager() {
         return backpackManager;
+    }
+    public void saveBackpack() {
+        backpackDatabaseManager.saveBackpack(sharedBackpack);
+    }
+    public Backpack loadBackpack() {
+        Backpack backpack = backpackDatabaseManager.loadBackpack();
+        if (backpack == null) {
+            backpack = new Backpack(); // Assuming Backpack has a default constructor
+        }
+        return backpack;
+    }
+    public Backpack getSharedBackpack() {
+        return sharedBackpack;
     }
 }
