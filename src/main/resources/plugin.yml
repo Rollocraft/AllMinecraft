@@ -10,3 +10,5 @@ commands:
     description: Opens the backpack!
     usage: /backpack
     aliases: bp
+  timer:
+    permission: allminecraft.command.timer
