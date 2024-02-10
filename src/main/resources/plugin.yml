@@ -1,0 +1,12 @@
+name: AllMinecraft
+version: '${project.version}'
+main: de.rollocraft.allminecraft.Main
+api-version: '1.20'
+commands:
+  skipitem:
+    description: Skips the current item!
+    usage: /skipitem
+  backpack:
+    description: Opens the backpack!
+    usage: /backpack
+    aliases: bp
