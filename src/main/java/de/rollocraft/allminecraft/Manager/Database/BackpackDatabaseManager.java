@@ -14,18 +14,13 @@ public class BackpackDatabaseManager {
 
     private Connection connection;
 
-    public BackpackDatabaseManager(String filename) {
-        connect(filename);
+    public BackpackDatabaseManager() throws SQLException {
+        connect();
         createTable();
     }
 
-    private void connect(String filename) {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + filename);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+    public void connect() throws SQLException {
+        connection = DriverManager.getConnection("jdbc:sqlite:./plugins/Challenges/Database/Database.db");
     }
 
     private void createTable() {

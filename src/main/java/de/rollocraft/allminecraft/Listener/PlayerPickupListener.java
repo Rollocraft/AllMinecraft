@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Events;
+package de.rollocraft.allminecraft.Listener;
 
 import de.rollocraft.allminecraft.Main;
 import de.rollocraft.allminecraft.Manager.BossBarManager;
@@ -12,12 +12,12 @@ import de.rollocraft.allminecraft.Manager.Database.ItemDatabaseManager;
 
 import java.sql.SQLException;
 
-public class PlayerPickupEvent implements Listener {
+public class PlayerPickupListener implements Listener {
     private final Main plugin;
     private final ItemDatabaseManager databaseManager;
     private final BossBarManager bossBarManager;
 
-    public PlayerPickupEvent(Main plugin, ItemDatabaseManager databaseManager, BossBarManager bossBarManager) {
+    public PlayerPickupListener(Main plugin, ItemDatabaseManager databaseManager, BossBarManager bossBarManager) {
         this.plugin = plugin;
         this.databaseManager = databaseManager;
         this.bossBarManager = bossBarManager;

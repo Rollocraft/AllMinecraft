@@ -1,15 +1,17 @@
 package de.rollocraft.allminecraft;
 
 import de.rollocraft.allminecraft.Commands.BackpackCommand;
+import de.rollocraft.allminecraft.Commands.PositionCommand;
 import de.rollocraft.allminecraft.Commands.SkipItemCommand;
 import de.rollocraft.allminecraft.Commands.TimerCommand;
-import de.rollocraft.allminecraft.Events.PlayerJoinListener;
-import de.rollocraft.allminecraft.Events.PlayerPickupEvent;
+import de.rollocraft.allminecraft.Listener.PlayerJoinListener;
+import de.rollocraft.allminecraft.Listener.PlayerPickupListener;
 import de.rollocraft.allminecraft.Manager.Backpack;
 import de.rollocraft.allminecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Manager.BossBarManager;
 import de.rollocraft.allminecraft.Manager.Database.BackpackDatabaseManager;
 import de.rollocraft.allminecraft.Manager.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Manager.Database.PositionDatabaseManager;
 import de.rollocraft.allminecraft.Manager.Database.TimerDatabaseManager;
 
 import de.rollocraft.allminecraft.Manager.Timer;
@@ -30,6 +32,7 @@ public class Main extends JavaPlugin {
     private TimerDatabaseManager timerDatabaseManager;
     private BackpackDatabaseManager backpackDatabaseManager;
     private Backpack sharedBackpack;
+    private PositionDatabaseManager positionDatabaseManager;
 
     @Override
     public void onLoad() {
@@ -60,7 +63,21 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to connect to database or save items: " + e.getMessage());
         }
 
-        backpackDatabaseManager = new BackpackDatabaseManager("backpacks.db");
+        positionDatabaseManager = new PositionDatabaseManager();
+        try {
+            positionDatabaseManager.connectToDatabase();
+            if (positionDatabaseManager.isConnected()) {
+                positionDatabaseManager.createTableIfNotExists();
+            }
+        } catch (SQLException e) {
+            getLogger().severe("Failed to connect to position database or create table: " + e.getMessage());
+        }
+
+        try {
+            backpackDatabaseManager = new BackpackDatabaseManager();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         sharedBackpack = loadBackpack();
 
         // Register BossBar
@@ -81,7 +98,7 @@ public class Main extends JavaPlugin {
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerPickupEvent(this, databaseManager, bossBarManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, databaseManager, bossBarManager), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
@@ -89,6 +106,8 @@ public class Main extends JavaPlugin {
         this.getCommand("timer").setTabCompleter(timerCommand);
         this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, databaseManager));
         this.getCommand("backpack").setExecutor(new BackpackCommand());
+        this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
+        this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
 
         getLogger().info("AllMinecraft Plugin has been enabled!");
 
@@ -110,6 +129,14 @@ public class Main extends JavaPlugin {
                 databaseManager.disconnectFromDatabase();
             } catch (SQLException e) {
                 getLogger().severe("Failed to disconnect from database: " + e.getMessage());
+            }
+        }
+
+        if (positionDatabaseManager != null) {
+            try {
+                positionDatabaseManager.disconnectFromDatabase();
+            } catch (SQLException e) {
+                getLogger().severe("Failed to disconnect from position database: " + e.getMessage());
             }
         }
 

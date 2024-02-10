@@ -6,9 +6,12 @@ commands:
   skipitem:
     description: Skips the current item!
     usage: /skipitem
+    permission: allminecraft.command.skipitem
   backpack:
     description: Opens the backpack!
     usage: /backpack
     aliases: bp
   timer:
     permission: allminecraft.command.timer
+  position:
+    aliases: pos

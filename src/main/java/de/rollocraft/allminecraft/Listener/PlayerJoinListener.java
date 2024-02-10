@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Events;
+package de.rollocraft.allminecraft.Listener;
 
 import de.rollocraft.allminecraft.Manager.BossBarManager;
 import org.bukkit.entity.Player;
