@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import de.rollocraft.allminecraft.Main;
 
+import java.util.concurrent.TimeUnit;
+
 
 public class Timer {
 
@@ -46,8 +48,34 @@ public class Timer {
             }
 
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD.toString() +
-                    ChatColor.BOLD + getTime()));
+                    ChatColor.BOLD + formatTime()));
         }
+    }
+
+    public String formatTime() {
+        long totalSeconds = getTime();
+        long days = TimeUnit.SECONDS.toDays(totalSeconds);
+        long hours = TimeUnit.SECONDS.toHours(totalSeconds) - (days * 24);
+        long minutes = TimeUnit.SECONDS.toMinutes(totalSeconds) - (TimeUnit.SECONDS.toHours(totalSeconds) * 60);
+        long seconds = totalSeconds - (TimeUnit.SECONDS.toMinutes(totalSeconds) * 60);
+
+        StringBuilder time = new StringBuilder();
+        if (days > 0) {
+            if (days == 1) {
+                time.append(days).append(" day, ");
+            } else {
+                time.append(days).append(" days, ");
+            }
+        }
+        if (hours > 0) {
+            time.append(hours).append(":");
+        }
+        if (minutes > 0) {
+            time.append(minutes).append(":");
+        }
+        time.append(seconds).append("");
+
+        return time.toString();
     }
 
     private void run() {

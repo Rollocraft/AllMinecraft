@@ -62,10 +62,10 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(ChatColor.GRAY + "Der Timer wurde gestoppt.");
                 break;
             }
-            case "time": {
+            case "set": {
                 if(args.length != 2) {
                     sender.sendMessage(ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
-                            "/timer time <Zeit>");
+                            "/timer set <Zeit>");
                     return true;
                 }
 
@@ -105,7 +105,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
     private void sendUsage(CommandSender sender) {
         sender.sendMessage(ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
-                "/timer resume, /timer pause, /timer time <Zeit>, /timer reset");
+                "/timer resume, /timer pause, /timer set <Zeit>, /timer reset");
     }
 
     @Override
@@ -116,7 +116,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
                 arguments.add("resume");
                 arguments.add("pause");
-                arguments.add("time");
+                arguments.add("set");
                 arguments.add("reset");
 
                 return arguments;
