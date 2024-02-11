@@ -4,11 +4,13 @@ package de.rollocraft.allminecraft.Commands;
 import de.rollocraft.allminecraft.Manager.Database.PositionDatabaseManager;
 import de.rollocraft.allminecraft.Manager.Position;
 import org.bukkit.ChatColor;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,6 +87,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                 } else {
                     // Display the position to the player
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(position));
+                    spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -100,6 +103,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                 } else {
                     // Display the position to the player
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(position));
+                    spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -123,6 +127,18 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
             return str;
         }
     }
+
+    public void spawnParticleBeam(Player player, Position position, Particle particle) {
+        Vector direction = position.toVector().subtract(player.getLocation().toVector()).normalize();
+        Vector current = player.getLocation().toVector();
+
+        while (current.distance(position.toVector()) > 1) {
+            player.getWorld().spawnParticle(particle, current.toLocation(player.getWorld()), 1);
+            current.add(direction);
+        }
+    }
+
+
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

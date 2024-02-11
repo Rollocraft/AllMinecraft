@@ -4,8 +4,10 @@ import de.rollocraft.allminecraft.Commands.BackpackCommand;
 import de.rollocraft.allminecraft.Commands.PositionCommand;
 import de.rollocraft.allminecraft.Commands.SkipItemCommand;
 import de.rollocraft.allminecraft.Commands.TimerCommand;
+import de.rollocraft.allminecraft.Listener.InventoryInteractListener;
 import de.rollocraft.allminecraft.Listener.PlayerJoinListener;
 import de.rollocraft.allminecraft.Listener.PlayerPickupListener;
+import de.rollocraft.allminecraft.Listener.PlayerQuitListener;
 import de.rollocraft.allminecraft.Manager.Backpack;
 import de.rollocraft.allminecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Manager.BossBarManager;
@@ -99,6 +101,8 @@ public class Main extends JavaPlugin {
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager), this);
         getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, databaseManager, bossBarManager), this);
+        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, databaseManager, bossBarManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);

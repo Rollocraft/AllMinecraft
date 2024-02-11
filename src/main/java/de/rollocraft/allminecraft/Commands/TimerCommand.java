@@ -42,7 +42,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.GRAY + "Der Timer wurde gestartet.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE+ "Der Timer wurde gestartet.");
                 break;
             }
             case "pause": {
@@ -75,7 +75,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                     timer.setRunning(false);
                     timer.setTime(Integer.parseInt(args[1]));
                     dbManager.saveTimer(timer); // Save the timer value
-                    sender.sendMessage(ChatColor.GRAY + "Die Zeit wurde auf " + args[1] + " gesetzt.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE + "Die Zeit wurde auf " + args[1] + " gesetzt.");
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Dein Parameter 2 muss eine Zahl sein.");
                 } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.GRAY + "Der Timer wurde zurückgesetzt.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE + "Der Timer wurde zurückgesetzt.");
                 break;
             }
             default:
@@ -104,7 +104,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendUsage(CommandSender sender) {
-        sender.sendMessage(ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
+        sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
                 "/timer resume, /timer pause, /timer set <Zeit>, /timer reset");
     }
 

@@ -18,5 +18,6 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         bossBarManager.getBossBar().addPlayer(player);
+        event.setJoinMessage(null);
     }
 }

@@ -1,5 +1,7 @@
 package de.rollocraft.allminecraft.Manager;
 
+import org.bukkit.util.Vector;
+
 public class Position {
     private double x;
     private double y;
@@ -21,5 +23,8 @@ public class Position {
 
     public double getZ() {
         return z;
+    }
+    public Vector toVector() {
+        return new Vector(x, y, z);
     }
 }
