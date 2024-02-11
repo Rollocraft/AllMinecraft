@@ -21,6 +21,7 @@ public class BackpackCommand implements CommandExecutor {
         Backpack backpack = Main.getInstance().getSharedBackpack();
 
         player.openInventory(backpack.getInventory());
+        player.sendMessage(ChatColor.AQUA + "[Backpack] " + ChatColor.WHITE)
         return true;
     }
 }

@@ -103,6 +103,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, databaseManager, bossBarManager), this);
         getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, databaseManager, bossBarManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
+        getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
