@@ -38,6 +38,8 @@ public class Timer {
         this.time = time;
     }
 
+    private static Timer timer;
+
     public void sendActionBar() {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
@@ -50,6 +52,10 @@ public class Timer {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD.toString() +
                     ChatColor.BOLD + formatTime()));
         }
+    }
+
+    public static Timer getTimer() {
+        return timer;
     }
 
     public String formatTime() {
