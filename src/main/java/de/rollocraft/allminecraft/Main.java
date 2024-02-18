@@ -1,23 +1,23 @@
 package de.rollocraft.allminecraft;
 
-import de.rollocraft.allminecraft.Commands.BackpackCommand;
-import de.rollocraft.allminecraft.Commands.PositionCommand;
-import de.rollocraft.allminecraft.Commands.SkipItemCommand;
-import de.rollocraft.allminecraft.Commands.TimerCommand;
-import de.rollocraft.allminecraft.Listener.InventoryInteractListener;
-import de.rollocraft.allminecraft.Listener.PlayerJoinListener;
-import de.rollocraft.allminecraft.Listener.PlayerPickupListener;
-import de.rollocraft.allminecraft.Listener.PlayerQuitListener;
-import de.rollocraft.allminecraft.Manager.Backpack;
-import de.rollocraft.allminecraft.Manager.BackpackManager;
-import de.rollocraft.allminecraft.Manager.BossBarManager;
-import de.rollocraft.allminecraft.Manager.Database.BackpackDatabaseManager;
-import de.rollocraft.allminecraft.Manager.Database.ItemDatabaseManager;
-import de.rollocraft.allminecraft.Manager.Database.PositionDatabaseManager;
-import de.rollocraft.allminecraft.Manager.Database.TimerDatabaseManager;
+import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
+import de.rollocraft.allminecraft.Minecraft.Commands.BackpackCommand;
+import de.rollocraft.allminecraft.Minecraft.Commands.PositionCommand;
+import de.rollocraft.allminecraft.Minecraft.Commands.SkipItemCommand;
+import de.rollocraft.allminecraft.Minecraft.Commands.TimerCommand;
+import de.rollocraft.allminecraft.Minecraft.Listener.InventoryInteractListener;
+import de.rollocraft.allminecraft.Minecraft.Listener.PlayerJoinListener;
+import de.rollocraft.allminecraft.Minecraft.Listener.PlayerPickupListener;
+import de.rollocraft.allminecraft.Minecraft.Listener.PlayerQuitListener;
+import de.rollocraft.allminecraft.Minecraft.Manager.Backpack;
+import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.Database.BackpackDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.Database.PositionDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.Database.TimerDatabaseManager;
 
-import de.rollocraft.allminecraft.Manager.Timer;
-import de.rollocraft.allminecraft.utils.Config;
+import de.rollocraft.allminecraft.Minecraft.Manager.Timer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -27,7 +27,6 @@ public class Main extends JavaPlugin {
 
     private static Main instance;
     private Timer timer;
-    private Config config;
     private BackpackManager backpackManager;
     private ItemDatabaseManager databaseManager;
     private BossBarManager bossBarManager;
@@ -35,12 +34,12 @@ public class Main extends JavaPlugin {
     private BackpackDatabaseManager backpackDatabaseManager;
     private Backpack sharedBackpack;
     private PositionDatabaseManager positionDatabaseManager;
+    private DiscordBotManager discordBotManager;
 
     @Override
     public void onLoad() {
         getLogger().info("Loading AllMinecraft Plugin...");
         instance = this;
-        config = new Config();
     }
 
     @Override
@@ -48,7 +47,10 @@ public class Main extends JavaPlugin {
         getLogger().info("Enabling AllMinecraft Plugin this may take a a few seconds...");
 
         //Create the database directory if it doesn't exist
-        File directory = new File("./plugins/Challenges/Database");
+        File directory = new File("./plugins/AllMinecraft/Database");
+        saveDefaultConfig();
+        String botToken = getConfig().getString("botToken");
+        String channelId = getConfig().getString("channelId");
         if (!directory.exists()){
             directory.mkdirs();
         }
@@ -113,6 +115,8 @@ public class Main extends JavaPlugin {
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
 
+        discordBotManager = DiscordBotManager.start(botToken, channelId, "on");
+
         getLogger().info("AllMinecraft Plugin has been enabled!");
 
     }
@@ -147,6 +151,10 @@ public class Main extends JavaPlugin {
         if (bossBarManager != null) {
             bossBarManager.removeBossBar();
         }
+
+        if (discordBotManager != null) {
+            discordBotManager.shutdown();
+        }
         getLogger().info("Everything is saved and the plugin has been disabled!");
     }
 
@@ -154,9 +162,7 @@ public class Main extends JavaPlugin {
         return instance;
     }
 
-    public Config getConfiguration() {
-        return config;
-    }
+
 
     public Timer getTimer() {
         return timer;
