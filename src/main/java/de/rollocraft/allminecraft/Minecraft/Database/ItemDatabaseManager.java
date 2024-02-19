@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Minecraft.Manager.Database;
+package de.rollocraft.allminecraft.Minecraft.Database;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.sql.*;
 
-import static de.rollocraft.allminecraft.Minecraft.Manager.ItemAvialabel.isObtainableInSurvival;
+import static de.rollocraft.allminecraft.Minecraft.utils.ItemAvialabel.isObtainableInSurvival;
 
 public class ItemDatabaseManager {
 
@@ -22,13 +22,26 @@ public class ItemDatabaseManager {
     }
 
     public void createTableIfNotExists() throws SQLException {
-        if (connection == null) {
-            throw new SQLException("Not connected to the database.");
+        String sql = "CREATE TABLE IF NOT EXISTS items (" +
+                "item_name TEXT NOT NULL, " +
+                "done INTEGER NOT NULL, " +
+                "current_item INTEGER NOT NULL DEFAULT 0" +
+                ");";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.execute();
+        }
+    }
+
+    public void setCurrentItem(String itemName) throws SQLException {
+        String resetSql = "UPDATE items SET current_item = 0";
+        try (PreparedStatement resetStmt = connection.prepareStatement(resetSql)) {
+            resetStmt.execute();
         }
 
-        String sql = "CREATE TABLE IF NOT EXISTS items (item_name TEXT, done INTEGER)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.executeUpdate();
+        String setSql = "UPDATE items SET current_item = 1 WHERE item_name = ?";
+        try (PreparedStatement setStmt = connection.prepareStatement(setSql)) {
+            setStmt.setString(1, itemName);
+            setStmt.execute();
         }
     }
 
@@ -143,5 +156,17 @@ public class ItemDatabaseManager {
     }
     public Connection getConnection() {
         return connection;
+    }
+
+    public String getCurrentItem() throws SQLException {
+        String sql = "SELECT item_name FROM items WHERE current_item = 1";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("item_name");
+            } else {
+                return null;
+            }
+        }
     }
 }

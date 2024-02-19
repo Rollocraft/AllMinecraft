@@ -1,6 +1,6 @@
-package de.rollocraft.allminecraft.Minecraft.Manager.Database;
+package de.rollocraft.allminecraft.Minecraft.Database;
 
-import de.rollocraft.allminecraft.Minecraft.Manager.Position;
+import de.rollocraft.allminecraft.Minecraft.Position;
 
 import java.sql.*;
 

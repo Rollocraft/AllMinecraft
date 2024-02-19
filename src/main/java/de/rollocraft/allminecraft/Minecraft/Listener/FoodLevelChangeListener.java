@@ -1,6 +1,6 @@
 package de.rollocraft.allminecraft.Minecraft.Listener;
 
-import de.rollocraft.allminecraft.Minecraft.Manager.Timer;
+import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;

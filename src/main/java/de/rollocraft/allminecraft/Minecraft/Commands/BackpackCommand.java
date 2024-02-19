@@ -1,11 +1,12 @@
 package de.rollocraft.allminecraft.Minecraft.Commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import de.rollocraft.allminecraft.Main;
-import de.rollocraft.allminecraft.Minecraft.Manager.Backpack;
+import de.rollocraft.allminecraft.Minecraft.Backpack;
 
 public class BackpackCommand implements CommandExecutor {
 
@@ -21,7 +22,7 @@ public class BackpackCommand implements CommandExecutor {
         Backpack backpack = Main.getInstance().getSharedBackpack();
 
         player.openInventory(backpack.getInventory());
-        player.sendMessage(ChatColor.AQUA + "[Backpack] " + ChatColor.WHITE)
+        player.sendMessage(ChatColor.AQUA + "[Backpack] " + ChatColor.WHITE + "Backpack geöffnet!");
         return true;
     }
 }

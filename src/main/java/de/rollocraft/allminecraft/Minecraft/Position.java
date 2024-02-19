@@ -1,5 +1,7 @@
-package de.rollocraft.allminecraft.Minecraft.Manager;
+package de.rollocraft.allminecraft.Minecraft;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 public class Position {
@@ -26,5 +28,8 @@ public class Position {
     }
     public Vector toVector() {
         return new Vector(x, y, z);
+    }
+    public Location toLocation(World world) {
+        return new Location(world, this.getX(), this.getY(), this.getZ());
     }
 }

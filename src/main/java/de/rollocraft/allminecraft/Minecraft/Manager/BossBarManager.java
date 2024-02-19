@@ -1,7 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.Manager;
 
 import de.rollocraft.allminecraft.Main;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.ItemDatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -33,9 +33,12 @@ public class BossBarManager {
     }
 
     public void updateBossBar() {
+        Bukkit.getLogger().info("Updating boss bar");
         try {
-            currentItem = databaseManager.getRandomItem();
+            String currentItem = databaseManager.getCurrentItem();
+            Bukkit.getLogger().info("Current item: " + currentItem);
             if (currentItem != null && !databaseManager.isItemDone(currentItem)) {
+                Bukkit.getLogger().info("Updating boss bar with current item: " + currentItem);
                 String formattedItem = currentItem.replace("_", " ").toLowerCase();
                 formattedItem = formattedItem.substring(0, 1).toUpperCase() + formattedItem.substring(1);
                 int doneItems = databaseManager.countDoneItems();
@@ -44,6 +47,7 @@ public class BossBarManager {
 
                 double progress = (double) doneItems / totalItems;
                 bossBar.setProgress(progress);
+
             }
         } catch (SQLException e) {
             plugin.getLogger().severe("Failed to get random item from database: " + e.getMessage());
@@ -58,9 +62,5 @@ public class BossBarManager {
 
     public BossBar getBossBar() {
         return bossBar;
-    }
-
-    public String getCurrentItem() {
-        return currentItem;
     }
 }

@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Minecraft.Manager;
+package de.rollocraft.allminecraft.Minecraft;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;

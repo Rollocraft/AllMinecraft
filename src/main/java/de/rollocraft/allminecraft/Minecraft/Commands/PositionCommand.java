@@ -1,8 +1,8 @@
 package de.rollocraft.allminecraft.Minecraft.Commands;
 
 
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.PositionDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.Position;
+import de.rollocraft.allminecraft.Minecraft.Database.PositionDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Position;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
@@ -88,6 +88,11 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                     // Display the position to the player
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(position));
                     spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
+
+                    // Calculate the distance between the player and the position
+                    double distance = player.getLocation().distance(position.toLocation(player.getWorld()));
+                    double distanceRounded = Math.round(distance * 100.0) / 100.0;
+                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distance + " meters");
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -151,7 +156,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                 arguments.add("show");
 
                 return arguments;
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {
+            } else if (args.length == 2 && ((args[0].equalsIgnoreCase("show") || (args[0].equalsIgnoreCase(""))))) {
                 List<String> positionNames = new ArrayList<>();
                 try {
                     // Get all position names from the database

@@ -1,0 +1,15 @@
+############################################
+#  Conifguration file for Allminecraft     #
+#                                          #
+#  Plugin made by: Rollocraft              #
+############################################
+
+#Discord
+#Set ur Bot Token
+botToken: "YOUR_BOT_TOKEN"
+
+#Set ur Channel ID
+channelId: "YOUR_CHANNEL_ID"
+
+
+#Minecraft

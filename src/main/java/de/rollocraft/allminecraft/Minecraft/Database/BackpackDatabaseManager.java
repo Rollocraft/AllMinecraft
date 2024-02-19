@@ -1,6 +1,6 @@
-package de.rollocraft.allminecraft.Minecraft.Manager.Database;
+package de.rollocraft.allminecraft.Minecraft.Database;
 
-import de.rollocraft.allminecraft.Minecraft.Manager.Backpack;
+import de.rollocraft.allminecraft.Minecraft.Backpack;
 
 import java.io.IOException;
 import java.sql.Connection;

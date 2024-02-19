@@ -1,6 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.Manager;
 
 import de.rollocraft.allminecraft.Main;
+import de.rollocraft.allminecraft.Minecraft.Backpack;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.IOException;

@@ -5,8 +5,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import de.rollocraft.allminecraft.Main;
-import de.rollocraft.allminecraft.Minecraft.Manager.Timer;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.TimerDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Database.TimerDatabaseManager;
 import org.bukkit.command.TabCompleter;
 
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 Timer timer = Main.getInstance().getTimer();
 
                 if (timer.isRunning()) {
-                    sender.sendMessage(ChatColor.RED + "Der Timer läuft bereits.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " +  ChatColor.RED + "Der Timer läuft bereits.");
                     break;
                 }
 
@@ -42,14 +42,14 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE+ "Der Timer wurde gestartet.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Der Timer wurde gestartet.");
                 break;
             }
             case "pause": {
                 Timer timer = Main.getInstance().getTimer();
 
                 if (!timer.isRunning()) {
-                    sender.sendMessage(ChatColor.RED + "Der Timer läuft nicht.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " +ChatColor.RED + "Der Timer läuft nicht.");
                     break;
                 }
 
@@ -59,12 +59,12 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.GRAY + "Der Timer wurde gestoppt.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Der Timer wurde gestoppt.");
                 break;
             }
             case "set": {
                 if(args.length != 2) {
-                    sender.sendMessage(ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
                             "/timer set <Zeit>");
                     return true;
                 }

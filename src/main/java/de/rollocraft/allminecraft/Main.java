@@ -1,23 +1,20 @@
 package de.rollocraft.allminecraft;
 
-import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
 import de.rollocraft.allminecraft.Minecraft.Commands.BackpackCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.PositionCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.SkipItemCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.TimerCommand;
-import de.rollocraft.allminecraft.Minecraft.Listener.InventoryInteractListener;
-import de.rollocraft.allminecraft.Minecraft.Listener.PlayerJoinListener;
-import de.rollocraft.allminecraft.Minecraft.Listener.PlayerPickupListener;
-import de.rollocraft.allminecraft.Minecraft.Listener.PlayerQuitListener;
-import de.rollocraft.allminecraft.Minecraft.Manager.Backpack;
+import de.rollocraft.allminecraft.Minecraft.Listener.*;
+import de.rollocraft.allminecraft.Minecraft.Backpack;
 import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.BackpackDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.ItemDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.PositionDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.Database.TimerDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.BackpackDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.PositionDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.TimerDatabaseManager;
 
-import de.rollocraft.allminecraft.Minecraft.Manager.Timer;
+import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -28,13 +25,13 @@ public class Main extends JavaPlugin {
     private static Main instance;
     private Timer timer;
     private BackpackManager backpackManager;
-    private ItemDatabaseManager databaseManager;
+    private ItemDatabaseManager itemDatabaseManager;
     private BossBarManager bossBarManager;
     private TimerDatabaseManager timerDatabaseManager;
     private BackpackDatabaseManager backpackDatabaseManager;
     private Backpack sharedBackpack;
     private PositionDatabaseManager positionDatabaseManager;
-    private DiscordBotManager discordBotManager;
+    private TabListManager tabListManager;
 
     @Override
     public void onLoad() {
@@ -56,12 +53,15 @@ public class Main extends JavaPlugin {
         }
 
         // Database
-        databaseManager = new ItemDatabaseManager();
+        itemDatabaseManager = new ItemDatabaseManager();
         try {
-            databaseManager.connectToDatabase();
-            if (databaseManager.isConnected()) {
-                databaseManager.createTableIfNotExists();
-                databaseManager.saveAllItemsToDatabase();
+            itemDatabaseManager.connectToDatabase();
+            if (itemDatabaseManager.isConnected()) {
+                itemDatabaseManager.createTableIfNotExists();
+                itemDatabaseManager.saveAllItemsToDatabase();
+                if (itemDatabaseManager.getCurrentItem() == null) {
+                    itemDatabaseManager.setCurrentItem(itemDatabaseManager.getRandomItem());
+                }
             }
         } catch (SQLException e) {
             getLogger().severe("Failed to connect to database or save items: " + e.getMessage());
@@ -85,9 +85,9 @@ public class Main extends JavaPlugin {
         sharedBackpack = loadBackpack();
 
         // Register BossBar
-        bossBarManager = new BossBarManager(this, databaseManager);
+        bossBarManager = new BossBarManager(this, itemDatabaseManager);
 
-        timerDatabaseManager = new TimerDatabaseManager(databaseManager.getConnection());
+        timerDatabaseManager = new TimerDatabaseManager(itemDatabaseManager.getConnection());
         try {
             timerDatabaseManager.createTimerTableIfNotExists();
         } catch (SQLException e) {
@@ -99,24 +99,23 @@ public class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
         backpackManager = new BackpackManager();
+        tabListManager = new TabListManager(this, itemDatabaseManager, bossBarManager);
 
         // Events
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, databaseManager, bossBarManager), this);
-        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, databaseManager, bossBarManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
+        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-        getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
+        // getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
         this.getCommand("timer").setExecutor(timerCommand);
         this.getCommand("timer").setTabCompleter(timerCommand);
-        this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, databaseManager));
+        this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, itemDatabaseManager,tabListManager));
         this.getCommand("backpack").setExecutor(new BackpackCommand());
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
-
-        discordBotManager = DiscordBotManager.start(botToken, channelId, "on");
 
         getLogger().info("AllMinecraft Plugin has been enabled!");
 
@@ -133,9 +132,9 @@ public class Main extends JavaPlugin {
         backpackManager.save();
         getLogger().info("Saving all items to database...");
 
-        if (databaseManager != null) {
+        if (itemDatabaseManager != null) {
             try {
-                databaseManager.disconnectFromDatabase();
+                itemDatabaseManager.disconnectFromDatabase();
             } catch (SQLException e) {
                 getLogger().severe("Failed to disconnect from database: " + e.getMessage());
             }
@@ -153,9 +152,6 @@ public class Main extends JavaPlugin {
             bossBarManager.removeBossBar();
         }
 
-        if (discordBotManager != null) {
-            discordBotManager.shutdown();
-        }
         getLogger().info("Everything is saved and the plugin has been disabled!");
     }
 
@@ -184,5 +180,8 @@ public class Main extends JavaPlugin {
     }
     public Backpack getSharedBackpack() {
         return sharedBackpack;
+    }
+    public TabListManager getTabListManager() {
+        return tabListManager;
     }
 }

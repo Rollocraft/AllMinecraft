@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Minecraft.Manager;
+package de.rollocraft.allminecraft.Minecraft;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -74,12 +74,24 @@ public class Timer {
             }
         }
         if (hours > 0) {
-            time.append(hours).append(":");
+            if (hours < 10){
+                time.append("0").append(hours).append(":");
+            } else {
+                time.append(hours).append(":");
+            }
         }
         if (minutes > 0) {
-            time.append(minutes).append(":");
+            if (minutes < 10){
+                time.append("0").append(minutes).append(":");
+            } else {
+                time.append(minutes).append(":");
+            }
         }
-        time.append(seconds).append("");
+        if (seconds < 10){
+            time.append("0").append(seconds);
+        } else {
+            time.append(seconds).append("");
+        }
 
         return time.toString();
     }
@@ -88,13 +100,10 @@ public class Timer {
         new BukkitRunnable() {
             @Override
             public void run() {
-
                 sendActionBar();
-
                 if (!isRunning()) {
                     return;
                 }
-
                 setTime(getTime() + 1);
             }
         }.runTaskTimer(Main.getInstance(), 20, 20);
