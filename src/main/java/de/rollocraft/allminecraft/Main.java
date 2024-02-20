@@ -7,6 +7,7 @@ import de.rollocraft.allminecraft.Minecraft.Commands.TimerCommand;
 import de.rollocraft.allminecraft.Minecraft.Database.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.*;
 import de.rollocraft.allminecraft.Minecraft.Backpack;
+import de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop.*;
 import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
@@ -115,11 +116,15 @@ public class Main extends JavaPlugin {
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
-        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager, timer), this);
+        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, itemDatabaseManager, bossBarManager, tabListManager, timer), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerAdvancementDoneListener(this, achievementDatabaseManager, tabListManager), this);
-        // getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
+        getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(timer), this);
+        getServer().getPluginManager().registerEvents(new PlayerMovementListener(timer), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(timer), this);
+        getServer().getPluginManager().registerEvents(new EntityDamageListener(timer), this);
+        getServer().getPluginManager().registerEvents(new PlayerInteractListener(timer), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);

@@ -32,8 +32,6 @@ public class PlayerJoinListener implements Listener {
                 "hat sich uns angeschlossen!",
                 "ist gerade aufgetaucht!",
                 "ist hier, um zu gewinnen!",
-
-                "canis hic nunc est filius",
                 "hat bemerkt das es 19:00 Uhr ist",
                 "ist dem Call beigetreten!",
                 "ist bereit, zu sIeGeN!"
@@ -44,6 +42,6 @@ public class PlayerJoinListener implements Listener {
         int randomIndex = new Random().nextInt(joinMessages.length);
 
         // Set the join message
-        event.setJoinMessage(ChatColor.GOLD + "" + event.getPlayer().getName() + " " + joinMessages[randomIndex]);
+        event.setJoinMessage(ChatColor.GOLD + event.getPlayer().getName() + " " + joinMessages[randomIndex]);
     }
 }

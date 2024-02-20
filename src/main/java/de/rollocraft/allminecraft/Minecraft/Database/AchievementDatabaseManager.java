@@ -47,9 +47,7 @@ public class AchievementDatabaseManager {
                 String namespace = advancement.getKey().getNamespace();
                 String key = advancement.getKey().getKey();
                 String fullKey = namespace + ":" + key;
-                Bukkit.getLogger().info("Checking advancement: " + fullKey); // Debugging information
                 if (fullKey.contains("minecraft:adventure") || fullKey.contains("minecraft:end") || fullKey.contains("minecraft:nether") || fullKey.contains("minecraft:husbandry") || fullKey.contains("minecraft:story")) {
-                    Bukkit.getLogger().info("Advancement matches criteria: " + fullKey); // Debugging information
                     statement.setString(1, key);
                     statement.setInt(2, 0); // Set 'done' to 0 (false) initially
                     statement.executeUpdate();
