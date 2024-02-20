@@ -4,15 +4,12 @@ import de.rollocraft.allminecraft.Minecraft.Commands.BackpackCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.PositionCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.SkipItemCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.TimerCommand;
+import de.rollocraft.allminecraft.Minecraft.Database.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.*;
 import de.rollocraft.allminecraft.Minecraft.Backpack;
 import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
-import de.rollocraft.allminecraft.Minecraft.Database.BackpackDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Database.ItemDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Database.PositionDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Database.TimerDatabaseManager;
 
 import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,6 +29,7 @@ public class Main extends JavaPlugin {
     private Backpack sharedBackpack;
     private PositionDatabaseManager positionDatabaseManager;
     private TabListManager tabListManager;
+    private AchievementDatabaseManager achievementDatabaseManager;
 
     @Override
     public void onLoad() {
@@ -46,9 +44,11 @@ public class Main extends JavaPlugin {
         //Create the database directory if it doesn't exist
         File directory = new File("./plugins/AllMinecraft/Database");
         saveDefaultConfig();
+        /*
         String botToken = getConfig().getString("botToken");
         String channelId = getConfig().getString("channelId");
-        if (!directory.exists()){
+         */
+        if (!directory.exists()) {
             directory.mkdirs();
         }
 
@@ -77,6 +77,18 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to connect to position database or create table: " + e.getMessage());
         }
 
+        achievementDatabaseManager = new AchievementDatabaseManager();
+        try {
+            achievementDatabaseManager.connectToDatabase();
+            if (achievementDatabaseManager.isConnected()) {
+                achievementDatabaseManager.createTableIfNotExists();
+                achievementDatabaseManager.saveAllAchievementsToDatabase();
+
+            }
+        } catch (SQLException e) {
+            getLogger().severe("Failed to connect to achievement database or create table: " + e.getMessage());
+        }
+
         try {
             backpackDatabaseManager = new BackpackDatabaseManager();
         } catch (SQLException e) {
@@ -99,20 +111,21 @@ public class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
         backpackManager = new BackpackManager();
-        tabListManager = new TabListManager(this, itemDatabaseManager, bossBarManager);
+        tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager);
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, itemDatabaseManager, bossBarManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerAdvancementDoneListener(this, achievementDatabaseManager, tabListManager), this);
         // getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
         this.getCommand("timer").setExecutor(timerCommand);
         this.getCommand("timer").setTabCompleter(timerCommand);
-        this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, itemDatabaseManager,tabListManager));
+        this.getCommand("skipitem").setExecutor(new SkipItemCommand(bossBarManager, itemDatabaseManager, tabListManager));
         this.getCommand("backpack").setExecutor(new BackpackCommand());
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
@@ -123,13 +136,17 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
         saveBackpack();
+
         try {
             timerDatabaseManager.saveTimer(timer);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         backpackManager.save();
+
         getLogger().info("Saving all items to database...");
 
         if (itemDatabaseManager != null) {
@@ -137,6 +154,14 @@ public class Main extends JavaPlugin {
                 itemDatabaseManager.disconnectFromDatabase();
             } catch (SQLException e) {
                 getLogger().severe("Failed to disconnect from database: " + e.getMessage());
+            }
+        }
+
+        if (achievementDatabaseManager != null) {
+            try {
+                achievementDatabaseManager.disconnectFromDatabase();
+            } catch (SQLException e) {
+                getLogger().severe("Failed to disconnect from achievement database: " + e.getMessage());
             }
         }
 
@@ -160,17 +185,14 @@ public class Main extends JavaPlugin {
     }
 
 
-
     public Timer getTimer() {
         return timer;
     }
 
-    public BackpackManager getBackpackManager() {
-        return backpackManager;
-    }
     public void saveBackpack() {
         backpackDatabaseManager.saveBackpack(sharedBackpack);
     }
+
     public Backpack loadBackpack() {
         Backpack backpack = backpackDatabaseManager.loadBackpack();
         if (backpack == null) {
@@ -178,10 +200,8 @@ public class Main extends JavaPlugin {
         }
         return backpack;
     }
+
     public Backpack getSharedBackpack() {
         return sharedBackpack;
-    }
-    public TabListManager getTabListManager() {
-        return tabListManager;
     }
 }

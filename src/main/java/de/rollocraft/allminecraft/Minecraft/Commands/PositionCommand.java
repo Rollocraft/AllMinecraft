@@ -29,21 +29,21 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE +"Only players can use this command.");
+            sender.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Only players can use this command.");
             return true;
         }
 
         Player player = (Player) sender;
 
         if (args.length == 0) {
-            player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE +"Usage: /position <create|delete|get> [name]");
+            player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Usage: /position <create|delete|get> [name]");
             return true;
         }
 
         String action = args[0];
         if ("create".equals(action)) {
             if (args.length < 2) {
-                player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE +"Usage: /position create <name>");
+                player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Usage: /position create <name>");
                 return true;
             }
 
@@ -60,7 +60,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
 
         } else if ("delete".equals(action)) {
             if (args.length < 2) {
-                player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE +"Usage: /position delete <name>");
+                player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Usage: /position delete <name>");
                 return true;
             }
 
@@ -92,7 +92,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                     // Calculate the distance between the player and the position
                     double distance = player.getLocation().distance(position.toLocation(player.getWorld()));
                     double distanceRounded = Math.round(distance * 100.0) / 100.0;
-                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distance + " meters");
+                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distanceRounded + " meters");
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -107,7 +107,9 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "No position found with the name " + name);
                 } else {
                     // Display the position to the player
-                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(position));
+                    double distance = player.getLocation().distance(position.toLocation(player.getWorld()));
+                    double distanceRounded = Math.round(distance * 100.0) / 100.0;
+                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distanceRounded + " meters");
                     spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
                 }
             } catch (SQLException e) {
@@ -117,6 +119,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
 
         return true;
     }
+
     public String printPosition(Position position) {
         String x = formatFloat(position.getX());
         String y = formatFloat(position.getY());
@@ -142,7 +145,6 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
             current.add(direction);
         }
     }
-
 
 
     @Override

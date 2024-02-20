@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Minecraft.Manager;
+package de.rollocraft.allminecraft.Minecraft.utils;
 
 import org.bukkit.Material;
 import org.bukkit.World;

@@ -36,9 +36,7 @@ public class BossBarManager {
         Bukkit.getLogger().info("Updating boss bar");
         try {
             String currentItem = databaseManager.getCurrentItem();
-            Bukkit.getLogger().info("Current item: " + currentItem);
             if (currentItem != null && !databaseManager.isItemDone(currentItem)) {
-                Bukkit.getLogger().info("Updating boss bar with current item: " + currentItem);
                 String formattedItem = currentItem.replace("_", " ").toLowerCase();
                 formattedItem = formattedItem.substring(0, 1).toUpperCase() + formattedItem.substring(1);
                 int doneItems = databaseManager.countDoneItems();

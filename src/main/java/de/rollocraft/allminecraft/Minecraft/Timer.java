@@ -74,20 +74,20 @@ public class Timer {
             }
         }
         if (hours > 0) {
-            if (hours < 10){
+            if (hours < 10) {
                 time.append("0").append(hours).append(":");
             } else {
                 time.append(hours).append(":");
             }
         }
         if (minutes > 0) {
-            if (minutes < 10){
+            if (minutes < 10) {
                 time.append("0").append(minutes).append(":");
             } else {
                 time.append(minutes).append(":");
             }
         }
-        if (seconds < 10){
+        if (seconds < 10) {
             time.append("0").append(seconds);
         } else {
             time.append(seconds).append("");

@@ -26,9 +26,11 @@ public class Position {
     public double getZ() {
         return z;
     }
+
     public Vector toVector() {
         return new Vector(x, y, z);
     }
+
     public Location toLocation(World world) {
         return new Location(world, this.getX(), this.getY(), this.getZ());
     }

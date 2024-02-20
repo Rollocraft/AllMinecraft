@@ -36,7 +36,7 @@ public class SkipItemCommand implements CommandExecutor {
                 tabListManager.updateTabList();
                 sender.sendMessage(ChatColor.AQUA + "[All Items]" + ChatColor.WHITE + " Skipped item!");
                 return true;
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 sender.sendMessage(ChatColor.RED + "Failed to mark item as done: " + e.getMessage()); // Send error message to the player !Console wäre besser! -> Überarbeiten
                 return false;
             }

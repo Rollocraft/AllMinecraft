@@ -21,7 +21,7 @@ public class PlayerPickupListener implements Listener {
     private final BossBarManager bossBarManager;
     private final TabListManager tabListManager;
 
-    public PlayerPickupListener(Main plugin, ItemDatabaseManager itemdatabaseManager, BossBarManager bossBarManager, TabListManager tabListManager){
+    public PlayerPickupListener(Main plugin, ItemDatabaseManager itemdatabaseManager, BossBarManager bossBarManager, TabListManager tabListManager) {
         this.plugin = plugin;
         this.itemDatabaseManager = itemdatabaseManager;
         this.bossBarManager = bossBarManager;
@@ -33,14 +33,11 @@ public class PlayerPickupListener implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             ItemStack itemStack = event.getItem().getItemStack();
-            Bukkit.getLogger().info("Event123");
             if (itemStack != null) {
                 String itemName = itemStack.getType().name();
-                Bukkit.getLogger().info("Player picked up item: " + itemName);
                 try {
                     String currentItem = itemDatabaseManager.getCurrentItem(); // Get the current item from the database
                     if (itemName.equals(currentItem)) {
-                        Bukkit.getLogger().info("Player picked up the correct item");
                         itemDatabaseManager.markItemAsDone(itemName);
                         String newItem = itemDatabaseManager.getRandomItem();
                         itemDatabaseManager.setCurrentItem(newItem);// Set new random item

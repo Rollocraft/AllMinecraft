@@ -22,7 +22,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             sendUsage(sender);
             return true;
         }
@@ -32,7 +32,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 Timer timer = Main.getInstance().getTimer();
 
                 if (timer.isRunning()) {
-                    sender.sendMessage(ChatColor.AQUA + "[Timer] " +  ChatColor.RED + "Der Timer läuft bereits.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.RED + "Der Timer läuft bereits.");
                     break;
                 }
 
@@ -42,14 +42,14 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Der Timer wurde gestartet.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Der Timer wurde gestartet.");
                 break;
             }
             case "pause": {
                 Timer timer = Main.getInstance().getTimer();
 
                 if (!timer.isRunning()) {
-                    sender.sendMessage(ChatColor.AQUA + "[Timer] " +ChatColor.RED + "Der Timer läuft nicht.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.RED + "Der Timer läuft nicht.");
                     break;
                 }
 
@@ -59,12 +59,12 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Der Timer wurde gestoppt.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Der Timer wurde gestoppt.");
                 break;
             }
             case "set": {
-                if(args.length != 2) {
-                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
+                if (args.length != 2) {
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
                             "/timer set <Zeit>");
                     return true;
                 }
@@ -75,7 +75,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                     timer.setRunning(false);
                     timer.setTime(Integer.parseInt(args[1]));
                     dbManager.saveTimer(timer); // Save the timer value
-                    sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE + "Die Zeit wurde auf " + args[1] + " gesetzt.");
+                    sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Die Zeit wurde auf " + args[1] + " gesetzt.");
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Dein Parameter 2 muss eine Zahl sein.");
                 } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.WHITE + "Der Timer wurde zurückgesetzt.");
+                sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Der Timer wurde zurückgesetzt.");
                 break;
             }
             default:
@@ -104,7 +104,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendUsage(CommandSender sender) {
-        sender.sendMessage(ChatColor.AQUA + "[Timer]" + ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
+        sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
                 "/timer resume, /timer pause, /timer set <Zeit>, /timer reset");
     }
 
@@ -116,13 +116,10 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
                 arguments.add("resume");
                 arguments.add("pause");
-                arguments.add("set");
-                arguments.add("reset");
 
                 return arguments;
             }
         }
-
         return null;
     }
 }

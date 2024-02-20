@@ -1,5 +1,6 @@
 package de.rollocraft.allminecraft.Minecraft.Database;
 // TimerDatabaseManager.java
+
 import de.rollocraft.allminecraft.Minecraft.Timer;
 
 import java.sql.*;

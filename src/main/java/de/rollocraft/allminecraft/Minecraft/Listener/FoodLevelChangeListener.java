@@ -9,10 +9,11 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 public class FoodLevelChangeListener implements Listener {
     Timer timer = Timer.getTimer();
-    @EventHandler
-    public void onFoodLevelChange(FoodLevelChangeEvent event  ) {
 
-        if (!timer.isRunning()){
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+
+        if (!timer.isRunning()) {
             event.setCancelled(true);
         }
     }
