@@ -11,8 +11,8 @@ public class MobViewerCommand implements CommandExecutor {
 
     private final MobViewerManager mobViewerManager;
 
-    public MobViewerCommand() {
-        this.mobViewerManager = new MobViewerManager();
+    public MobViewerCommand(MobViewerManager mobViewerManager) {
+        this.mobViewerManager = mobViewerManager;
     }
 
     @Override

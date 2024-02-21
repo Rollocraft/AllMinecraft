@@ -34,6 +34,7 @@ public class Main extends JavaPlugin {
     private AchievementDatabaseManager achievementDatabaseManager;
     private DiscordBotManager botManager;
     private MobViewerManager mobViewerManager;
+    private MobDatabaseManager mobDatabaseManager;
 
     @Override
     public void onLoad() {
@@ -78,7 +79,7 @@ public class Main extends JavaPlugin {
             }
         }
 
-        //ItemDatabase Connection
+        //Item Database Connection
         itemDatabaseManager = new ItemDatabaseManager();
         try {
             itemDatabaseManager.connectToDatabase();
@@ -138,11 +139,23 @@ public class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        //Mob Database Connection
+        mobDatabaseManager = new MobDatabaseManager();
+        try {
+            mobDatabaseManager.connectToDatabase();
+            if (mobDatabaseManager.isConnected()) {
+                mobDatabaseManager.createTableIfNotExists();
+                mobDatabaseManager.saveAllMobsToDatabase();
+            }
+        } catch (SQLException e) {
+            getLogger().severe("Failed to connect to achievement database or create table: " + e.getMessage());
+        }
+
         //Managers
         backpackManager = new BackpackManager();
-        mobViewerManager = new MobViewerManager();
+        mobViewerManager = new MobViewerManager(mobDatabaseManager);
         bossBarManager = new BossBarManager(this, itemDatabaseManager);
-        tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager);
+        tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager,mobDatabaseManager);
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
@@ -155,6 +168,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockBreakListener(timer), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(timer), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(timer), this);
+        getServer().getPluginManager().registerEvents(new EntityDeathListener(mobDatabaseManager,tabListManager), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
@@ -164,7 +178,8 @@ public class Main extends JavaPlugin {
         this.getCommand("backpack").setExecutor(new BackpackCommand());
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
-        this.getCommand("mobviewer").setExecutor(new MobViewerCommand());
+        this.getCommand("mobviewer").setExecutor(new MobViewerCommand(mobViewerManager));
+
 
 
         getLogger().info("AllMinecraft Plugin has been enabled!");

@@ -1,12 +1,14 @@
 package de.rollocraft.allminecraft.Minecraft.Manager;
 
+import de.rollocraft.allminecraft.Minecraft.Database.MobDatabaseManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +17,10 @@ public class MobViewerManager {
 
     private final List<Material> spawnEggs = new ArrayList<>();
     private final int itemsPerPage = 45;
+    private final MobDatabaseManager mobDatabaseManager;
 
-    public MobViewerManager() {
+    public MobViewerManager(MobDatabaseManager mobDatabaseManager) {
+        this.mobDatabaseManager = mobDatabaseManager;
         for (Material material : Material.values()) {
             if (material.name().endsWith("_SPAWN_EGG")) {
                 spawnEggs.add(material);
@@ -31,7 +35,23 @@ public class MobViewerManager {
 
         int start = page * itemsPerPage;
         for (int i = start; i < start + itemsPerPage && i < spawnEggs.size(); i++) {
-            inv.addItem(new ItemStack(spawnEggs.get(i), 1));
+            Material spawnEgg = spawnEggs.get(i);
+            String mobKey = spawnEgg.name().replace("_SPAWN_EGG", "");
+            ItemStack item = new ItemStack(spawnEgg, 1);
+            ItemMeta meta = item.getItemMeta();
+            String mobName = mobKey.replace("_", " ").toLowerCase();
+            mobName = mobName.substring(0, 1).toUpperCase() + mobName.substring(1);
+            try {
+                if (mobDatabaseManager.isMobFound(mobKey)) {
+                    meta.setDisplayName(mobName + " - " + ChatColor.GREEN + "Found");
+                } else {
+                    meta.setDisplayName(mobName + " - " + ChatColor.RED + "Not Found");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            item.setItemMeta(meta);
+            inv.addItem(item);
         }
 
         // Add navigation items

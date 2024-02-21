@@ -3,6 +3,7 @@ package de.rollocraft.allminecraft.Minecraft.Manager;
 import de.rollocraft.allminecraft.Main;
 import de.rollocraft.allminecraft.Minecraft.Database.AchievementDatabaseManager;
 import de.rollocraft.allminecraft.Minecraft.Database.ItemDatabaseManager;
+import de.rollocraft.allminecraft.Minecraft.Database.MobDatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -13,12 +14,15 @@ public class TabListManager {
 
     private final ItemDatabaseManager itemDatabaseManager;
     private final AchievementDatabaseManager achievementDatabaseManager;
+    private final MobDatabaseManager mobDatabaseManager;
 
-    public TabListManager(Main plugin, ItemDatabaseManager itemDatabaseManager, AchievementDatabaseManager achievementDatabaseManager) {
+    public TabListManager(Main plugin, ItemDatabaseManager itemDatabaseManager, AchievementDatabaseManager achievementDatabaseManager, MobDatabaseManager mobDatabaseManager) {
         this.plugin = plugin;
         this.itemDatabaseManager = itemDatabaseManager;
         this.achievementDatabaseManager = achievementDatabaseManager;
+        this.mobDatabaseManager = mobDatabaseManager;
     }
+
 
     public void updateTabList() {
         try {
@@ -34,7 +38,11 @@ public class TabListManager {
                 int totalAchievements = achievementDatabaseManager.countTotalAchievements();
                 String achievementTitle = String.format("All Achievements (%d/%d)", doneAchievements, totalAchievements);
 
-                String title = itemTitle + "\n" + achievementTitle;
+                int foundMobs = mobDatabaseManager.countFoundMobs();
+                int totalMobs = mobDatabaseManager.countTotalMobs();
+                String mobTitle = String.format("All Mobs (%d/%d)", foundMobs, totalMobs);
+
+                String title = " " + "\n" + itemTitle + "\n" + achievementTitle + "\n" + mobTitle;
 
                 // Set the tab list footer for all online players
                 for (Player player : Bukkit.getOnlinePlayers()) {
