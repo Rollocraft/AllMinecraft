@@ -15,3 +15,5 @@ commands:
     permission: allminecraft.command.timer
   position:
     aliases: pos
+  mobviewer:
+    aliases: mv

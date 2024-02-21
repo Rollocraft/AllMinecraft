@@ -1,15 +1,13 @@
 package de.rollocraft.allminecraft;
 
 import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
-import de.rollocraft.allminecraft.Minecraft.Commands.BackpackCommand;
-import de.rollocraft.allminecraft.Minecraft.Commands.PositionCommand;
-import de.rollocraft.allminecraft.Minecraft.Commands.SkipItemCommand;
-import de.rollocraft.allminecraft.Minecraft.Commands.TimerCommand;
+import de.rollocraft.allminecraft.Minecraft.Commands.*;
 import de.rollocraft.allminecraft.Minecraft.Database.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.*;
 import de.rollocraft.allminecraft.Minecraft.Backpack;
 import de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop.*;
 import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.MobViewerManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 
@@ -35,6 +33,7 @@ public class Main extends JavaPlugin {
     private TabListManager tabListManager;
     private AchievementDatabaseManager achievementDatabaseManager;
     private DiscordBotManager botManager;
+    private MobViewerManager mobViewerManager;
 
     @Override
     public void onLoad() {
@@ -50,14 +49,17 @@ public class Main extends JavaPlugin {
         File directory = new File("./plugins/AllMinecraft/Database");
         saveDefaultConfig();
 
+        //Config values
         String botToken = getConfig().getString("botToken");
         String channelId = getConfig().getString("channelId");
         boolean startBot = getConfig().getBoolean("start-bot");
 
+        //Create the directory if it doesn't exist
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
+        //Start the bot
         if (startBot) {
             if (botToken == null || botToken.isEmpty()) {
                 Bukkit.getLogger().warning("Bitte setze ein gültigen Bot-Token in der config.yml");
@@ -76,7 +78,7 @@ public class Main extends JavaPlugin {
             }
         }
 
-        // Database
+        //ItemDatabase Connection
         itemDatabaseManager = new ItemDatabaseManager();
         try {
             itemDatabaseManager.connectToDatabase();
@@ -91,6 +93,7 @@ public class Main extends JavaPlugin {
             Bukkit.getLogger().info("Failed to connect to database or save items: " + e.getMessage());
         }
 
+        //Position Database Connection
         positionDatabaseManager = new PositionDatabaseManager();
         try {
             positionDatabaseManager.connectToDatabase();
@@ -101,6 +104,7 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to connect to position database or create table: " + e.getMessage());
         }
 
+        //Achievement Database Connection
         achievementDatabaseManager = new AchievementDatabaseManager();
         try {
             achievementDatabaseManager.connectToDatabase();
@@ -113,6 +117,7 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to connect to achievement database or create table: " + e.getMessage());
         }
 
+        //Backpack Database Connection
         try {
             backpackDatabaseManager = new BackpackDatabaseManager();
         } catch (SQLException e) {
@@ -120,9 +125,7 @@ public class Main extends JavaPlugin {
         }
         sharedBackpack = loadBackpack();
 
-        // Register BossBar
-        bossBarManager = new BossBarManager(this, itemDatabaseManager);
-
+        //TimerDatabase Connection
         timerDatabaseManager = new TimerDatabaseManager(itemDatabaseManager.getConnection());
         try {
             timerDatabaseManager.createTimerTableIfNotExists();
@@ -134,13 +137,17 @@ public class Main extends JavaPlugin {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        //Managers
         backpackManager = new BackpackManager();
+        mobViewerManager = new MobViewerManager();
+        bossBarManager = new BossBarManager(this, itemDatabaseManager);
         tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager);
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager, timer), this);
-        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this, itemDatabaseManager, bossBarManager, tabListManager, timer), this);
+        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this,itemDatabaseManager, bossBarManager, tabListManager, timer, mobViewerManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerAdvancementDoneListener(this, achievementDatabaseManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(timer), this);
@@ -157,6 +164,8 @@ public class Main extends JavaPlugin {
         this.getCommand("backpack").setExecutor(new BackpackCommand());
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
+        this.getCommand("mobviewer").setExecutor(new MobViewerCommand());
+
 
         getLogger().info("AllMinecraft Plugin has been enabled!");
 
