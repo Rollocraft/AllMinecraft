@@ -1,5 +1,6 @@
 package de.rollocraft.allminecraft;
 
+import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
 import de.rollocraft.allminecraft.Minecraft.Commands.BackpackCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.PositionCommand;
 import de.rollocraft.allminecraft.Minecraft.Commands.SkipItemCommand;
@@ -13,8 +14,10 @@ import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 
 import de.rollocraft.allminecraft.Minecraft.Timer;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.sql.SQLException;
 
@@ -31,6 +34,7 @@ public class Main extends JavaPlugin {
     private PositionDatabaseManager positionDatabaseManager;
     private TabListManager tabListManager;
     private AchievementDatabaseManager achievementDatabaseManager;
+    private DiscordBotManager botManager;
 
     @Override
     public void onLoad() {
@@ -45,12 +49,31 @@ public class Main extends JavaPlugin {
         //Create the database directory if it doesn't exist
         File directory = new File("./plugins/AllMinecraft/Database");
         saveDefaultConfig();
-        /*
+
         String botToken = getConfig().getString("botToken");
         String channelId = getConfig().getString("channelId");
-         */
+        boolean startBot = getConfig().getBoolean("start-bot");
+
         if (!directory.exists()) {
             directory.mkdirs();
+        }
+
+        if (startBot) {
+            if (botToken == null || botToken.isEmpty()) {
+                Bukkit.getLogger().warning("Bitte setze ein gültigen Bot-Token in der config.yml");
+                return;
+            }
+
+            if (channelId == null || channelId.isEmpty()) {
+                Bukkit.getLogger().warning("Bitte setze eine gültige Channel-ID in der config.yml");
+                return;
+            }
+            try {
+                botManager = new DiscordBotManager(botToken, channelId);
+                botManager.start();
+            } catch (LoginException | InterruptedException e) {
+                Bukkit.getLogger().warning("Es gab ein Problem beim Starten des Bots: " + e.getMessage());
+            }
         }
 
         // Database
@@ -65,7 +88,7 @@ public class Main extends JavaPlugin {
                 }
             }
         } catch (SQLException e) {
-            getLogger().severe("Failed to connect to database or save items: " + e.getMessage());
+            Bukkit.getLogger().info("Failed to connect to database or save items: " + e.getMessage());
         }
 
         positionDatabaseManager = new PositionDatabaseManager();
@@ -141,7 +164,6 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
         saveBackpack();
 
         try {
@@ -182,6 +204,9 @@ public class Main extends JavaPlugin {
             bossBarManager.removeBossBar();
         }
 
+        if (botManager != null) {
+            botManager.stop();
+        }
         getLogger().info("Everything is saved and the plugin has been disabled!");
     }
 
