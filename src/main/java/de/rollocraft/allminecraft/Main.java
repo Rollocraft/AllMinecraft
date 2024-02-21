@@ -163,12 +163,13 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryInteractListener(this,itemDatabaseManager, bossBarManager, tabListManager, timer, mobViewerManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerAdvancementDoneListener(this, achievementDatabaseManager, tabListManager), this);
+        getServer().getPluginManager().registerEvents(new EntityDeathListener(mobDatabaseManager,tabListManager), this);
         getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(timer), this);
         getServer().getPluginManager().registerEvents(new PlayerMovementListener(timer), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(timer), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(timer), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(timer), this);
-        getServer().getPluginManager().registerEvents(new EntityDeathListener(mobDatabaseManager,tabListManager), this);
+        getServer().getPluginManager().registerEvents(new WeatherChangeListener(timer), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
@@ -179,6 +180,7 @@ public class Main extends JavaPlugin {
         this.getCommand("position").setExecutor(new PositionCommand(positionDatabaseManager));
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
         this.getCommand("mobviewer").setExecutor(new MobViewerCommand(mobViewerManager));
+        this.getCommand("save-allminecraft").setExecutor(new SaveAllCommand(backpackManager));
 
 
 
@@ -188,7 +190,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        saveBackpack();
+        backpackDatabaseManager.saveBackpack(sharedBackpack);
 
         try {
             timerDatabaseManager.saveTimer(timer);
@@ -241,10 +243,6 @@ public class Main extends JavaPlugin {
 
     public Timer getTimer() {
         return timer;
-    }
-
-    public void saveBackpack() {
-        backpackDatabaseManager.saveBackpack(sharedBackpack);
     }
 
     public Backpack loadBackpack() {

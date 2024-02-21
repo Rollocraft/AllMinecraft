@@ -45,6 +45,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Der Timer wurde gestartet.");
                 break;
             }
+            case "stop":
             case "pause": {
                 Timer timer = Main.getInstance().getTimer();
 
@@ -104,7 +105,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendUsage(CommandSender sender) {
-        sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.GRAY + "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
+        sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE+ "Verwendung" + ChatColor.DARK_GRAY + ": " + ChatColor.BLUE +
                 "/timer resume, /timer pause, /timer set <Zeit>, /timer reset");
     }
 
@@ -116,6 +117,7 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
                 arguments.add("resume");
                 arguments.add("pause");
+                arguments.add("stop");
 
                 return arguments;
             }
