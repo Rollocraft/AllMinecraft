@@ -5,6 +5,7 @@ import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 import de.rollocraft.allminecraft.Minecraft.Database.ItemDatabaseManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Timer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +21,7 @@ public class InventoryInteractListener implements Listener {
     private final ItemDatabaseManager itemDatabaseManager;
     private final BossBarManager bossBarManager;
 
-    public InventoryInteractListener(Main plugin, ItemDatabaseManager itemDatabaseManager, BossBarManager bossBarManager, TabListManager tablistManager,Timer timer) {
+    public InventoryInteractListener(Main plugin, ItemDatabaseManager itemDatabaseManager, BossBarManager bossBarManager, TabListManager tablistManager, Timer timer) {
         this.plugin = plugin;
         this.itemDatabaseManager = itemDatabaseManager;
         this.bossBarManager = bossBarManager;
@@ -44,7 +45,7 @@ public class InventoryInteractListener implements Listener {
                     if (itemName.equals(currentItem)) {
                         itemDatabaseManager.markItemAsDone(currentItem); // Mark the item as done
                         String newItem = itemDatabaseManager.getRandomItem();
-                        plugin.getServer().broadcastMessage("Das item " + currentItem + " wurde von " + player.getName() + "gefunden");
+                        plugin.getServer().broadcastMessage(ChatColor.AQUA + "[AllItems] " + ChatColor.WHITE + "Das Item: " + itemDatabaseManager.getDisplayName(currentItem) + ", wurde von " + player.getName() + " gefunden!");
                         itemDatabaseManager.setCurrentItem(newItem);// Set new random item
                         bossBarManager.updateBossBar(); // Update the boss bar
                         tabListManager.updateTabList();

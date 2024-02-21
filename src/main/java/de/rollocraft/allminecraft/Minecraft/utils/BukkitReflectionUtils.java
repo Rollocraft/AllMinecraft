@@ -1,7 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import javax.annotation.Nonnull;
 
@@ -10,6 +10,7 @@ public final class BukkitReflectionUtils {
         try {
             return material.isAir();
         } catch (Throwable ex) {
+            Bukkit.getLogger().info("Failed to check if material is air: " + ex);
         }
 
         switch (material.name()) {
@@ -23,19 +24,12 @@ public final class BukkitReflectionUtils {
         }
     }
 
-    public static int getMinHeight(@Nonnull World world) {
-        try {
-            return world.getMinHeight();
-        } catch (Throwable ex) {
-        }
-
-        return 0;
-    }
     @Deprecated
     public static boolean isInWater(@Nonnull Entity entity) {
         try {
             return entity.isInWater();
         } catch (Throwable ex) {
+            Bukkit.getLogger().info("Failed to check if entity is in water: " + ex);
         }
 
         return false;

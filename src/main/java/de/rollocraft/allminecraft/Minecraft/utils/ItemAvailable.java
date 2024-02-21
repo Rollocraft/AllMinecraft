@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import javax.annotation.Nonnull;
 
-public class ItemAvialabel {
+public class ItemAvailable {
     public static boolean isObtainableInSurvival(@Nonnull Material material) {
         if (!material.isItem()) return false;
         String name = material.name();
@@ -16,7 +16,9 @@ public class ItemAvialabel {
         if (name.endsWith("_COPPER_DOOR")) return false;
         if (name.endsWith("_COPPER_GRATE")) return false;
         if (name.endsWith("_COPPER_BLUB")) return false;
+        if (name.endsWith("CHISELED_COPPER")) return false;
         if (name.contains("_WALL_")) return false;
+
         switch (name) { // Use name instead of enum its self, to prevent NoSuchFieldErrors in older versions where this specific enum does not exist
             case "CHAIN_COMMAND_BLOCK":
             case "REPEATING_COMMAND_BLOCK":

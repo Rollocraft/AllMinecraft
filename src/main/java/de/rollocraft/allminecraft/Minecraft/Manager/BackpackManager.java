@@ -2,6 +2,7 @@ package de.rollocraft.allminecraft.Minecraft.Manager;
 
 import de.rollocraft.allminecraft.Main;
 import de.rollocraft.allminecraft.Minecraft.Backpack;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.IOException;
@@ -14,17 +15,6 @@ public class BackpackManager {
         load();
     }
 
-    public Backpack getBackpack() {
-        if (backpack == null) {
-            backpack = new Backpack();
-        }
-        return backpack;
-    }
-
-    public void setBackpack(Backpack backpack) {
-        this.backpack = backpack;
-    }
-
     private void load() {
         FileConfiguration config = Main.getInstance().getConfig();
         String base64 = config.getString("backpack");
@@ -33,7 +23,7 @@ public class BackpackManager {
             try {
                 backpack = new Backpack(base64);
             } catch (IOException e) {
-                e.printStackTrace();
+                Bukkit.getLogger().info("Failed to load backpack from base64 string" + e);
             }
         } else {
             backpack = new Backpack();

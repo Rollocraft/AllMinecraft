@@ -4,6 +4,7 @@ import de.rollocraft.allminecraft.Main;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Timer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,7 +45,7 @@ public class PlayerPickupListener implements Listener {
                 if (itemName.equals(currentItem)) {
                     itemDatabaseManager.markItemAsDone(itemName);
                     String newItem = itemDatabaseManager.getRandomItem();
-                    plugin.getServer().broadcastMessage("Das item " + currentItem + " wurde von " + player.getName() + "gefunden");
+                    plugin.getServer().broadcastMessage(ChatColor.AQUA + "[AllItems] " + ChatColor.WHITE + "Das Item: " + itemDatabaseManager.getDisplayName(currentItem) + ", wurde von " + player.getName() + " gefunden!");
                     itemDatabaseManager.setCurrentItem(newItem);// Set new random item
                     bossBarManager.updateBossBar(); // Update the boss bar
                     tabListManager.updateTabList();

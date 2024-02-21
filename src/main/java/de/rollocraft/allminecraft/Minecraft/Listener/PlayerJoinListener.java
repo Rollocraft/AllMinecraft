@@ -28,13 +28,11 @@ public class PlayerJoinListener implements Listener {
 
         // Array of join messages
         String[] joinMessages = {
-                "hilft jetzt mit!",
-                "hat sich uns angeschlossen!",
-                "ist gerade aufgetaucht!",
-                "ist hier, um zu gewinnen!",
+                "hilft jetzt mit",
+                "hat sich uns angeschlossen",
+                "ist gerade aufgetaucht",
                 "hat bemerkt das es 19:00 Uhr ist",
-                "ist dem Call beigetreten!",
-                "ist bereit, zu sIeGeN!"
+                "ist dem Call beigetreten",
 
         };
 

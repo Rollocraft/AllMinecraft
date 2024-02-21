@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.sql.*;
 
-import static de.rollocraft.allminecraft.Minecraft.utils.ItemAvialabel.isObtainableInSurvival;
+import static de.rollocraft.allminecraft.Minecraft.utils.ItemAvailable.isObtainableInSurvival;
 
 public class ItemDatabaseManager {
 
@@ -169,5 +169,12 @@ public class ItemDatabaseManager {
                 return null;
             }
         }
+    }
+    public String getDisplayName(String item) {
+        String[] words = item.replace("_", " ").split(" ");
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+        return String.join(" ", words);
     }
 }

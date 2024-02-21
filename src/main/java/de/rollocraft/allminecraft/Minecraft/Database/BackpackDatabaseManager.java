@@ -1,6 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.Database;
 
 import de.rollocraft.allminecraft.Minecraft.Backpack;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,7 +28,7 @@ public class BackpackDatabaseManager {
                 "CREATE TABLE IF NOT EXISTS backpacks (items TEXT)")) {
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().severe("Error creating backpacks table: " + e);
         }
     }
 
@@ -37,7 +38,7 @@ public class BackpackDatabaseManager {
             statement.setString(1, backpack.toBase64());
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().severe("Error saving backpack: " + e);
         }
     }
 
@@ -50,7 +51,7 @@ public class BackpackDatabaseManager {
                 return new Backpack(items);
             }
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().severe("Error loading backpack: " + e);
         }
         return null;
     }

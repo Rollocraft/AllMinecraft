@@ -90,7 +90,7 @@ public class Timer {
         if (seconds < 10) {
             time.append("0").append(seconds);
         } else {
-            time.append(seconds).append("");
+            time.append(seconds);
         }
 
         return time.toString();

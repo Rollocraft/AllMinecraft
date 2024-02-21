@@ -1,4 +1,5 @@
 package de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop;
+
 import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -9,6 +10,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerMovementListener implements Listener {
     private final Timer timer;
+
     public PlayerMovementListener(Timer timer) {
         this.timer = timer;
     }

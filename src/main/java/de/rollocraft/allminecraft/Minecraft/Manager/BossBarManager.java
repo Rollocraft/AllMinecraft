@@ -13,8 +13,6 @@ public class BossBarManager {
     private final Main plugin;
     private final ItemDatabaseManager databaseManager;
     private BossBar bossBar;
-    private String currentItem;
-
     public BossBarManager(Main plugin, ItemDatabaseManager databaseManager) {
         this.plugin = plugin;
         this.databaseManager = databaseManager;
