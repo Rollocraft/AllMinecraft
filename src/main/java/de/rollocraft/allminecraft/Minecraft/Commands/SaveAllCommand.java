@@ -17,7 +17,6 @@ public class SaveAllCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             if (player.hasPermission("allminecraft.command.save-allminecraft")) {
-                backpackManager.save();
                 player.sendMessage("You saved all minecraft!");
                 return true;
             } else {

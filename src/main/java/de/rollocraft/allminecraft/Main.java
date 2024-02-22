@@ -4,15 +4,15 @@ import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
 import de.rollocraft.allminecraft.Minecraft.Commands.*;
 import de.rollocraft.allminecraft.Minecraft.Database.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.*;
-import de.rollocraft.allminecraft.Minecraft.Backpack;
-import de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop.*;
 import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
+import de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop.*;
 import de.rollocraft.allminecraft.Minecraft.Manager.MobViewerManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 
 import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.security.auth.login.LoginException;
@@ -23,18 +23,18 @@ public class Main extends JavaPlugin {
 
     private static Main instance;
     private Timer timer;
-    private BackpackManager backpackManager;
     private ItemDatabaseManager itemDatabaseManager;
     private BossBarManager bossBarManager;
     private TimerDatabaseManager timerDatabaseManager;
     private BackpackDatabaseManager backpackDatabaseManager;
-    private Backpack sharedBackpack;
+    private Inventory sharedBackpack;
     private PositionDatabaseManager positionDatabaseManager;
     private TabListManager tabListManager;
     private AchievementDatabaseManager achievementDatabaseManager;
     private DiscordBotManager botManager;
     private MobViewerManager mobViewerManager;
     private MobDatabaseManager mobDatabaseManager;
+    private BackpackManager backpackManager;
 
     @Override
     public void onLoad() {
@@ -119,12 +119,15 @@ public class Main extends JavaPlugin {
         }
 
         //Backpack Database Connection
+        backpackDatabaseManager = new BackpackDatabaseManager();
         try {
-            backpackDatabaseManager = new BackpackDatabaseManager();
+            backpackDatabaseManager.connectToDatabase();
+            if (backpackDatabaseManager.isConnected()) {
+                backpackDatabaseManager.createBackpackTableIfNotExists();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            getLogger().severe("Failed to connect to backpack database or create table: " + e.getMessage());
         }
-        sharedBackpack = loadBackpack();
 
         //TimerDatabase Connection
         timerDatabaseManager = new TimerDatabaseManager(itemDatabaseManager.getConnection());
@@ -152,7 +155,7 @@ public class Main extends JavaPlugin {
         }
 
         //Managers
-        backpackManager = new BackpackManager();
+        backpackManager = new BackpackManager(backpackDatabaseManager);
         mobViewerManager = new MobViewerManager(mobDatabaseManager);
         bossBarManager = new BossBarManager(this, itemDatabaseManager);
         tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager,mobDatabaseManager);
@@ -183,6 +186,10 @@ public class Main extends JavaPlugin {
         this.getCommand("save-allminecraft").setExecutor(new SaveAllCommand(backpackManager));
 
 
+        // Load the shared backpack
+        if (backpackManager.loadBackpack() != null) {
+            sharedBackpack = backpackManager.loadBackpack();
+        }
 
         getLogger().info("AllMinecraft Plugin has been enabled!");
 
@@ -190,17 +197,14 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        backpackDatabaseManager.saveBackpack(sharedBackpack);
-
-        try {
-            timerDatabaseManager.saveTimer(timer);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        backpackManager.save();
-
         getLogger().info("Saving all items to database...");
+        if (timerDatabaseManager != null) {
+            try {
+                timerDatabaseManager.saveTimer(timer);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         if (itemDatabaseManager != null) {
             try {
@@ -226,6 +230,23 @@ public class Main extends JavaPlugin {
             }
         }
 
+        if (mobDatabaseManager != null) {
+            try {
+                mobDatabaseManager.disconnectFromDatabase();
+            } catch (SQLException e) {
+                getLogger().severe("Failed to disconnect from mob database: " + e.getMessage());
+            }
+        }
+
+        if (backpackDatabaseManager != null) {
+            try {
+                backpackManager.saveBackpack(sharedBackpack);
+                backpackDatabaseManager.disconnectFromDatabase();
+            } catch (SQLException e) {
+                getLogger().severe("Failed to disconnect from backpack database: " + e.getMessage());
+            }
+        }
+
         if (bossBarManager != null) {
             bossBarManager.removeBossBar();
         }
@@ -245,15 +266,8 @@ public class Main extends JavaPlugin {
         return timer;
     }
 
-    public Backpack loadBackpack() {
-        Backpack backpack = backpackDatabaseManager.loadBackpack();
-        if (backpack == null) {
-            backpack = new Backpack(); // Assuming Backpack has a default constructor
-        }
-        return backpack;
-    }
 
-    public Backpack getSharedBackpack() {
+    public Inventory getSharedBackpack() {
         return sharedBackpack;
     }
 }
