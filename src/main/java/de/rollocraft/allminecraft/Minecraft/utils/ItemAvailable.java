@@ -54,6 +54,7 @@ public class ItemAvailable {
             case "BUNDLE":
             case "REINFORCED_DEEPSLATE":
             case "FROGSPAWN":
+            case "CRAFTER":
                 return false;
         }
 

@@ -2,7 +2,7 @@ package de.rollocraft.allminecraft.Minecraft.Commands;
 
 
 import de.rollocraft.allminecraft.Minecraft.Database.PositionDatabaseManager;
-import de.rollocraft.allminecraft.Minecraft.Position;
+import de.rollocraft.allminecraft.Minecraft.Manager.PositionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
@@ -20,10 +20,10 @@ import java.util.List;
 
 public class PositionCommand implements CommandExecutor, TabCompleter {
 
-    private PositionDatabaseManager dbManager;
+    private PositionDatabaseManager positionDatabaseManager;
 
-    public PositionCommand(PositionDatabaseManager dbManager) {
-        this.dbManager = dbManager;
+    public PositionCommand(PositionDatabaseManager positionDatabaseManager) {
+        this.positionDatabaseManager = positionDatabaseManager;
     }
 
     @Override
@@ -49,10 +49,10 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
 
             String name = args[1];
             // Create a new position at the player's current location
-            Position position = new Position(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+            PositionManager position = new PositionManager(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
             try {
                 // Save the position to the database
-                dbManager.savePositionToDatabase(name, position.getX(), position.getY(), position.getZ());
+                positionDatabaseManager.savePositionToDatabase(name, position.getX(), position.getY(), position.getZ());
                 player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Position " + name + " created.");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -67,7 +67,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
             String name = args[1];
             try {
                 // Delete the position from the database
-                dbManager.deletePositionFromDatabase(name);
+                positionDatabaseManager.deletePositionFromDatabase(name);
                 player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Position " + name + " deleted.");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -81,16 +81,16 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
             String name = args[1];
             try {
                 // Get the position from the database
-                Position position = dbManager.getPositionFromDatabase(name);
-                if (position == null) {
+                PositionManager positionManager = positionDatabaseManager.getPositionFromDatabase(name);
+                if (positionManager == null) {
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "No position found with the name " + name);
                 } else {
                     // Display the position to the player
-                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(position));
-                    spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
+                    player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + name + ": " + printPosition(positionManager));
+                    spawnParticleBeam(player, positionManager, Particle.VILLAGER_HAPPY);
 
                     // Calculate the distance between the player and the position
-                    double distance = player.getLocation().distance(position.toLocation(player.getWorld()));
+                    double distance = player.getLocation().distance(positionManager.toLocation(player.getWorld()));
                     double distanceRounded = Math.round(distance * 100.0) / 100.0;
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distanceRounded + " meters");
                 }
@@ -102,15 +102,15 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
             String name = action;
             try {
                 // Get the position from the database
-                Position position = dbManager.getPositionFromDatabase(name);
-                if (position == null) {
+                PositionManager positionManager = positionDatabaseManager.getPositionFromDatabase(name);
+                if (positionManager == null) {
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "No position found with the name " + name);
                 } else {
                     // Display the position to the player
-                    double distance = player.getLocation().distance(position.toLocation(player.getWorld()));
+                    double distance = player.getLocation().distance(positionManager.toLocation(player.getWorld()));
                     double distanceRounded = Math.round(distance * 100.0) / 100.0;
                     player.sendMessage(ChatColor.AQUA + "[Position] " + ChatColor.WHITE + "Distance to " + name + ": " + distanceRounded + " meters");
-                    spawnParticleBeam(player, position, Particle.VILLAGER_HAPPY);
+                    spawnParticleBeam(player, positionManager, Particle.VILLAGER_HAPPY);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -120,10 +120,10 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    public String printPosition(Position position) {
-        String x = formatFloat(position.getX());
-        String y = formatFloat(position.getY());
-        String z = formatFloat(position.getZ());
+    public String printPosition(PositionManager positionManager) {
+        String x = formatFloat(positionManager.getX());
+        String y = formatFloat(positionManager.getY());
+        String z = formatFloat(positionManager.getZ());
         return x + " " + y + " " + z;
     }
 
@@ -136,11 +136,11 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    public void spawnParticleBeam(Player player, Position position, Particle particle) {
-        Vector direction = position.toVector().subtract(player.getLocation().toVector()).normalize();
+    public void spawnParticleBeam(Player player, PositionManager positionManager, Particle particle) {
+        Vector direction = positionManager.toVector().subtract(player.getLocation().toVector()).normalize();
         Vector current = player.getLocation().toVector();
 
-        while (current.distance(position.toVector()) > 1) {
+        while (current.distance(positionManager.toVector()) > 1) {
             player.getWorld().spawnParticle(particle, current.toLocation(player.getWorld()), 1);
             current.add(direction);
         }
@@ -163,7 +163,7 @@ public class PositionCommand implements CommandExecutor, TabCompleter {
                 try {
                     // Get all position names from the database
                     String sql = "SELECT name FROM positions";
-                    PreparedStatement statement = dbManager.getConnection().prepareStatement(sql);
+                    PreparedStatement statement = positionDatabaseManager.getConnection().prepareStatement(sql);
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()) {
                         positionNames.add(resultSet.getString("name"));

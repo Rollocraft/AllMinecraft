@@ -6,6 +6,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static de.rollocraft.allminecraft.Minecraft.utils.ItemAvailable.isObtainableInSurvival;
 
@@ -176,5 +178,62 @@ public class ItemDatabaseManager {
             words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
         }
         return String.join(" ", words);
+    }
+    public List<String> getAllItemNames() throws SQLException {
+        List<String> itemNames = new ArrayList<>();
+        String query = "SELECT item_name FROM items"; // Replace with your actual SQL query
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                itemNames.add(rs.getString("item_name"));
+            }
+        }
+        return itemNames;
+    }
+    public List<Material> searchItems(String searchText) throws SQLException {
+        List<Material> matchingItems = new ArrayList<>();
+
+        // Format the search text to match the format in the database
+        String formattedSearchText = searchText.replace(" ", "_").toUpperCase();
+        Bukkit.getLogger().info("Searching for items matching '" + formattedSearchText + "'...");
+
+        // Prepare a SQL query to search for items
+        String query = "SELECT * FROM items WHERE item_name LIKE ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, "%" + formattedSearchText + "%");
+
+        // Execute the query and collect the results
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            String itemName = resultSet.getString("item_name");
+            Material item = Material.getMaterial(itemName);
+            if (item != null) {
+                matchingItems.add(item);
+            }
+        }
+
+        return matchingItems;
+    }
+    public List<String> getDoneItemNames() throws SQLException {
+        List<String> doneItems = new ArrayList<>();
+        String sql = "SELECT item_name FROM items WHERE done = 1";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                doneItems.add(resultSet.getString("item_name"));
+            }
+        }
+        return doneItems;
+    }
+    public List<String> getNotDoneItemNames() throws SQLException {
+        List<String> notDoneItems = new ArrayList<>();
+        String sql = "SELECT item_name FROM items WHERE done = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                notDoneItems.add(resultSet.getString("item_name"));
+            }
+        }
+        return notDoneItems;
     }
 }

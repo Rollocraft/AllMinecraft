@@ -1,6 +1,6 @@
 package de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop;
 
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,15 +9,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerMovementListener implements Listener {
-    private final Timer timer;
+    private final TimerManager timerManager;
 
-    public PlayerMovementListener(Timer timer) {
-        this.timer = timer;
+    public PlayerMovementListener(TimerManager timerManager) {
+        this.timerManager = timerManager;
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (!timer.isRunning()) {
+        if (!timerManager.isRunning()) {
             Location from = event.getFrom();
             Location to = event.getTo();
 

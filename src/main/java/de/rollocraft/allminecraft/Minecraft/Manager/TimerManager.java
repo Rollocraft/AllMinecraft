@@ -1,4 +1,4 @@
-package de.rollocraft.allminecraft.Minecraft;
+package de.rollocraft.allminecraft.Minecraft.Manager;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -11,12 +11,12 @@ import de.rollocraft.allminecraft.Main;
 import java.util.concurrent.TimeUnit;
 
 
-public class Timer {
+public class TimerManager {
 
     private boolean running; // true or false
     private int time;
 
-    public Timer(int loadedTime) {
+    public TimerManager(int loadedTime) {
         this.time = loadedTime;
         this.running = false;
         run();
@@ -38,7 +38,7 @@ public class Timer {
         this.time = time;
     }
 
-    private static Timer timer;
+    private static TimerManager timerManager;
 
     public void sendActionBar() {
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -54,8 +54,8 @@ public class Timer {
         }
     }
 
-    public static Timer getTimer() {
-        return timer;
+    public static TimerManager getTimer() {
+        return timerManager;
     }
 
     public String formatTime() {

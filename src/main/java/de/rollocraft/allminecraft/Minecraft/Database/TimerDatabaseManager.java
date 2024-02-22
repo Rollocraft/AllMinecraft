@@ -1,7 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.Database;
 // TimerDatabaseManager.java
 
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 
 import java.sql.*;
 
@@ -18,10 +18,10 @@ public class TimerDatabaseManager {
         }
     }
 
-    public void saveTimer(Timer timer) throws SQLException {
+    public void saveTimer(TimerManager timerManager) throws SQLException {
         try (PreparedStatement pstmt = connection.prepareStatement("INSERT OR REPLACE INTO timer (id, time) VALUES (?, ?)")) {
             pstmt.setInt(1, 1); // Wir verwenden immer die ID 1 für den Timer
-            pstmt.setInt(2, timer.getTime());
+            pstmt.setInt(2, timerManager.getTime());
             pstmt.executeUpdate();
         }
     }

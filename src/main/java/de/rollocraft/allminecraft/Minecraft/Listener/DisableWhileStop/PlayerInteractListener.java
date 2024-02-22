@@ -1,20 +1,20 @@
 package de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop;
 
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerInteractListener implements Listener {
-    private final Timer timer;
+    private final TimerManager timerManager;
 
-    public PlayerInteractListener(Timer timer) {
-        this.timer = timer;
+    public PlayerInteractListener(TimerManager timerManager) {
+        this.timerManager = timerManager;
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!timer.isRunning()) {
+        if (!timerManager.isRunning()) {
             event.setCancelled(true);
         }
     }

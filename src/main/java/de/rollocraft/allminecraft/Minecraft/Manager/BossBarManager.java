@@ -31,20 +31,25 @@ public class BossBarManager {
     }
 
     public void updateBossBar() {
-        Bukkit.getLogger().info("Updating boss bar");
         try {
             String currentItem = databaseManager.getCurrentItem();
-            if (currentItem != null && !databaseManager.isItemDone(currentItem)) {
-                String formattedItem = currentItem.replace("_", " ").toLowerCase();
-                formattedItem = formattedItem.substring(0, 1).toUpperCase() + formattedItem.substring(1);
-                int doneItems = databaseManager.countDoneItems();
-                int totalItems = databaseManager.countTotalItems();
-                bossBar.setTitle(String.format("%s (%d/%d)", formattedItem, doneItems, totalItems));
-
-                double progress = (double) doneItems / totalItems;
-                bossBar.setProgress(progress);
-
+            if (currentItem == null || databaseManager.isItemDone(currentItem)) {
+                bossBar.setTitle("Standardtitel");
+                return;
             }
+            int doneItems = databaseManager.countDoneItems();
+            int totalItems = databaseManager.countTotalItems();
+            if (totalItems == 0) {
+                bossBar.setTitle("Standardtitel");
+                return;
+            }
+            String formattedItem = currentItem.replace("_", " ").toLowerCase();
+            formattedItem = formattedItem.substring(0, 1).toUpperCase() + formattedItem.substring(1);
+            bossBar.setTitle(String.format("%s (%d/%d)", formattedItem, doneItems, totalItems));
+
+            double progress = (double) doneItems / totalItems;
+            bossBar.setProgress(progress);
+
         } catch (SQLException e) {
             plugin.getLogger().severe("Failed to get random item from database: " + e.getMessage());
         }

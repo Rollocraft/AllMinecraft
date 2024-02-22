@@ -5,7 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import de.rollocraft.allminecraft.Main;
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 import de.rollocraft.allminecraft.Minecraft.Database.TimerDatabaseManager;
 import org.bukkit.command.TabCompleter;
 
@@ -29,16 +29,16 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "resume": {
-                Timer timer = Main.getInstance().getTimer();
+                TimerManager timerManager = Main.getInstance().getTimer();
 
-                if (timer.isRunning()) {
+                if (timerManager.isRunning()) {
                     sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.RED + "Der Timer läuft bereits.");
                     break;
                 }
 
-                timer.setRunning(true);
+                timerManager.setRunning(true);
                 try {
-                    dbManager.saveTimer(timer); // Save the timer value
+                    dbManager.saveTimer(timerManager); // Save the timer value
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -47,16 +47,16 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
             }
             case "stop":
             case "pause": {
-                Timer timer = Main.getInstance().getTimer();
+                TimerManager timerManager = Main.getInstance().getTimer();
 
-                if (!timer.isRunning()) {
+                if (!timerManager.isRunning()) {
                     sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.RED + "Der Timer läuft nicht.");
                     break;
                 }
 
-                timer.setRunning(false);
+                timerManager.setRunning(false);
                 try {
-                    dbManager.saveTimer(timer); // Save the timer value
+                    dbManager.saveTimer(timerManager); // Save the timer value
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -71,11 +71,11 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 }
 
                 try {
-                    Timer timer = Main.getInstance().getTimer();
+                    TimerManager timerManager = Main.getInstance().getTimer();
 
-                    timer.setRunning(false);
-                    timer.setTime(Integer.parseInt(args[1]));
-                    dbManager.saveTimer(timer); // Save the timer value
+                    timerManager.setRunning(false);
+                    timerManager.setTime(Integer.parseInt(args[1]));
+                    dbManager.saveTimer(timerManager); // Save the timer value
                     sender.sendMessage(ChatColor.AQUA + "[Timer] " + ChatColor.WHITE + "Die Zeit wurde auf " + args[1] + " gesetzt.");
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Dein Parameter 2 muss eine Zahl sein.");
@@ -85,12 +85,12 @@ public class TimerCommand implements CommandExecutor, TabCompleter {
                 break;
             }
             case "reset": {
-                Timer timer = Main.getInstance().getTimer();
+                TimerManager timerManager = Main.getInstance().getTimer();
 
-                timer.setRunning(false);
-                timer.setTime(0);
+                timerManager.setRunning(false);
+                timerManager.setTime(0);
                 try {
-                    dbManager.saveTimer(timer); // Save the timer value
+                    dbManager.saveTimer(timerManager); // Save the timer value
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

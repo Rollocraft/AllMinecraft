@@ -17,6 +17,8 @@ commands:
     aliases: pos
   mobviewer:
     aliases: mv
+  itemviewer:
+    aliases: iv
   save-allminecraft:
     permission: allminecraft.command.save-allminecraft
     aliases: sam

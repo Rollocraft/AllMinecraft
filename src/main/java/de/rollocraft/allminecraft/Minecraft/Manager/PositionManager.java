@@ -1,15 +1,15 @@
-package de.rollocraft.allminecraft.Minecraft;
+package de.rollocraft.allminecraft.Minecraft.Manager;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
-public class Position {
+public class PositionManager {
     private double x;
     private double y;
     private double z;
 
-    public Position(double x, double y, double z) {
+    public PositionManager(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;

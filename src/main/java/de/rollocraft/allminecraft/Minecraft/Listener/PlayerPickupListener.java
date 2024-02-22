@@ -3,7 +3,7 @@ package de.rollocraft.allminecraft.Minecraft.Listener;
 import de.rollocraft.allminecraft.Main;
 import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,19 +20,19 @@ public class PlayerPickupListener implements Listener {
     private final ItemDatabaseManager itemDatabaseManager;
     private final BossBarManager bossBarManager;
     private final TabListManager tabListManager;
-    private final Timer timer;
+    private final TimerManager timerManager;
 
-    public PlayerPickupListener(Main plugin, ItemDatabaseManager itemdatabaseManager, BossBarManager bossBarManager, TabListManager tabListManager, Timer timer) {
+    public PlayerPickupListener(Main plugin, ItemDatabaseManager itemdatabaseManager, BossBarManager bossBarManager, TabListManager tabListManager, TimerManager timerManager) {
         this.plugin = plugin;
         this.itemDatabaseManager = itemdatabaseManager;
         this.bossBarManager = bossBarManager;
         this.tabListManager = tabListManager;
-        this.timer = timer;
+        this.timerManager = timerManager;
     }
 
     @EventHandler
     public void onPlayerPickupItem(EntityPickupItemEvent event) {
-        if (!timer.isRunning()) {
+        if (!timerManager.isRunning()) {
             event.setCancelled(true);
             return;
         }

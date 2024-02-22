@@ -1,21 +1,21 @@
 package de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop;
 
-import de.rollocraft.allminecraft.Minecraft.Timer;
+import de.rollocraft.allminecraft.Minecraft.Manager.TimerManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 public class FoodLevelChangeListener implements Listener {
-    private final Timer timer;
+    private final TimerManager timerManager;
 
-    public FoodLevelChangeListener(Timer timer) {
-        this.timer = timer;
+    public FoodLevelChangeListener(TimerManager timerManager) {
+        this.timerManager = timerManager;
     }
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
 
-        if (!timer.isRunning()) {
+        if (!timerManager.isRunning()) {
             event.setCancelled(true);
         }
     }

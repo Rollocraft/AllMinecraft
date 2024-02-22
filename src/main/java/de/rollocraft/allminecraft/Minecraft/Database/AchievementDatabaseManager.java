@@ -79,7 +79,7 @@ public class AchievementDatabaseManager {
     public void markAchievementAsDone(String achievement) throws SQLException {
         String sql = "UPDATE achievements SET done = 1 WHERE achievement_key = ?";
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1.0F, 1.0F);
         }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, achievement);

@@ -4,13 +4,9 @@ import de.rollocraft.allminecraft.Discord.Manager.DiscordBotManager;
 import de.rollocraft.allminecraft.Minecraft.Commands.*;
 import de.rollocraft.allminecraft.Minecraft.Database.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.*;
-import de.rollocraft.allminecraft.Minecraft.Manager.BackpackManager;
+import de.rollocraft.allminecraft.Minecraft.Manager.*;
 import de.rollocraft.allminecraft.Minecraft.Listener.DisableWhileStop.*;
-import de.rollocraft.allminecraft.Minecraft.Manager.MobViewerManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.TabListManager;
-import de.rollocraft.allminecraft.Minecraft.Manager.BossBarManager;
 
-import de.rollocraft.allminecraft.Minecraft.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +18,7 @@ import java.sql.SQLException;
 public class Main extends JavaPlugin {
 
     private static Main instance;
-    private Timer timer;
+    private TimerManager timerManager;
     private ItemDatabaseManager itemDatabaseManager;
     private BossBarManager bossBarManager;
     private TimerDatabaseManager timerDatabaseManager;
@@ -35,6 +31,8 @@ public class Main extends JavaPlugin {
     private MobViewerManager mobViewerManager;
     private MobDatabaseManager mobDatabaseManager;
     private BackpackManager backpackManager;
+    private ItemViewerManager itemViewerManager;
+
 
     @Override
     public void onLoad() {
@@ -78,7 +76,6 @@ public class Main extends JavaPlugin {
                 Bukkit.getLogger().warning("Es gab ein Problem beim Starten des Bots: " + e.getMessage());
             }
         }
-
         //Item Database Connection
         itemDatabaseManager = new ItemDatabaseManager();
         try {
@@ -137,7 +134,7 @@ public class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
         try {
-            timer = new Timer(timerDatabaseManager.loadTimer());
+            timerManager = new TimerManager(timerDatabaseManager.loadTimer());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -159,20 +156,22 @@ public class Main extends JavaPlugin {
         mobViewerManager = new MobViewerManager(mobDatabaseManager);
         bossBarManager = new BossBarManager(this, itemDatabaseManager);
         tabListManager = new TabListManager(this, itemDatabaseManager, achievementDatabaseManager,mobDatabaseManager);
+        itemViewerManager = new ItemViewerManager(itemDatabaseManager);
 
         // Events
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(bossBarManager, tabListManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager, timer), this);
-        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this,itemDatabaseManager, bossBarManager, tabListManager, timer, mobViewerManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerPickupListener(this, itemDatabaseManager, bossBarManager, tabListManager, timerManager), this);
+        getServer().getPluginManager().registerEvents(new InventoryInteractListener(this,itemDatabaseManager, bossBarManager, tabListManager, timerManager, mobViewerManager, itemViewerManager), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerAdvancementDoneListener(this, achievementDatabaseManager, tabListManager), this);
         getServer().getPluginManager().registerEvents(new EntityDeathListener(mobDatabaseManager,tabListManager), this);
-        getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(timer), this);
-        getServer().getPluginManager().registerEvents(new PlayerMovementListener(timer), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(timer), this);
-        getServer().getPluginManager().registerEvents(new EntityDamageListener(timer), this);
-        getServer().getPluginManager().registerEvents(new PlayerInteractListener(timer), this);
-        getServer().getPluginManager().registerEvents(new WeatherChangeListener(timer), this);
+        getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerMovementListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new EntityDamageListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerInteractListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new WeatherChangeListener(timerManager), this);
+        getServer().getPluginManager().registerEvents(new SingChangeListener(itemDatabaseManager, itemViewerManager), this);
 
         // Commands
         TimerCommand timerCommand = new TimerCommand(timerDatabaseManager);
@@ -184,6 +183,7 @@ public class Main extends JavaPlugin {
         this.getCommand("position").setTabCompleter(new PositionCommand(positionDatabaseManager));
         this.getCommand("mobviewer").setExecutor(new MobViewerCommand(mobViewerManager));
         this.getCommand("save-allminecraft").setExecutor(new SaveAllCommand(backpackManager));
+        this.getCommand("itemviewer").setExecutor(new ItemViewerCommand(itemViewerManager));
 
 
         // Load the shared backpack
@@ -200,7 +200,7 @@ public class Main extends JavaPlugin {
         getLogger().info("Saving all items to database...");
         if (timerDatabaseManager != null) {
             try {
-                timerDatabaseManager.saveTimer(timer);
+                timerDatabaseManager.saveTimer(timerManager);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -262,8 +262,8 @@ public class Main extends JavaPlugin {
     }
 
 
-    public Timer getTimer() {
-        return timer;
+    public TimerManager getTimer() {
+        return timerManager;
     }
 
 

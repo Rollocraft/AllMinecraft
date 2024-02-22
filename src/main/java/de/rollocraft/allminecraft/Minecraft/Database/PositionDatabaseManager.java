@@ -1,6 +1,6 @@
 package de.rollocraft.allminecraft.Minecraft.Database;
 
-import de.rollocraft.allminecraft.Minecraft.Position;
+import de.rollocraft.allminecraft.Minecraft.Manager.PositionManager;
 
 import java.sql.*;
 
@@ -54,7 +54,7 @@ public class PositionDatabaseManager {
         }
     }
 
-    public Position getPositionFromDatabase(String name) throws SQLException {
+    public PositionManager getPositionFromDatabase(String name) throws SQLException {
         if (connection == null) {
             throw new SQLException("Not connected to the database.");
         }
@@ -67,7 +67,7 @@ public class PositionDatabaseManager {
                 double x = resultSet.getDouble("x");
                 double y = resultSet.getDouble("y");
                 double z = resultSet.getDouble("z");
-                return new Position(formatDouble(x), formatDouble(y), formatDouble(z));
+                return new PositionManager(formatDouble(x), formatDouble(y), formatDouble(z));
             } else {
                 return null;
             }

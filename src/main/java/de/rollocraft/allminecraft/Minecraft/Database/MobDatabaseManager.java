@@ -1,6 +1,9 @@
 package de.rollocraft.allminecraft.Minecraft.Database;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.sql.*;
 
@@ -64,6 +67,9 @@ public class MobDatabaseManager {
 
     public void markMobAsFound(String mob) throws SQLException {
         String sql = "UPDATE mobs SET found = 1 WHERE mob_key = ?";
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1.0F, 1.0F);
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, mob);
             statement.executeUpdate();

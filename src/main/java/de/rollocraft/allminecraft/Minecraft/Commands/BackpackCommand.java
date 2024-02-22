@@ -1,6 +1,7 @@
 package de.rollocraft.allminecraft.Minecraft.Commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,7 @@ public class BackpackCommand implements CommandExecutor {
         Inventory sharedBackpack = Main.getInstance().getSharedBackpack();
 
         player.openInventory(sharedBackpack);
+        player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1.0f, 1.0f);
         player.sendMessage(ChatColor.AQUA + "[Backpack] " + ChatColor.WHITE + "Backpack geöffnet!");
         return true;
     }
